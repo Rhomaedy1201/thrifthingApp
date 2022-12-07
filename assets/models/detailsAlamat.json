@@ -1,0 +1,19 @@
+{
+  "id_alamat_user": "2",
+  "id_user": "1",
+  "email": "rhomaedy@gmail.com",
+  "nama_lengkap_user": "Muhammad Rhomaedi",
+  "no_hp_user": "085259822977",
+  "nama_lengkap_alamat": "ak",
+  "no_hp_alamat": "08474646",
+  "id_provinsi": "9",
+  "provinsi": "Jawa Barat",
+  "id_kota": "24",
+  "kota": "Bandung Barat",
+  "id_kecamatan": "",
+  "kecamatan": "",
+  "kode_pos": "40721",
+  "detail_jalan": "saasas",
+  "detail_patokan": "asass",
+  "status": "user"
+}

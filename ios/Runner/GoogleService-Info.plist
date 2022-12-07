@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>258338558688-f8kffpm7cj2evgrm37une5dtvsgof3fq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.258338558688-f8kffpm7cj2evgrm37une5dtvsgof3fq</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>258338558688-eukarsu427tpn59nqadtkef53jcu3etj.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCjTN4Or8dqB8xaw-CqiLJbMqZHCemCWDA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>258338558688</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.trifthingApps</string>
+	<key>PROJECT_ID</key>
+	<string>go-thrift</string>
+	<key>STORAGE_BUCKET</key>
+	<string>go-thrift.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:258338558688:ios:3b0ab24fcb810203c1f685</string>
+	
+</dict>
+</plist>
