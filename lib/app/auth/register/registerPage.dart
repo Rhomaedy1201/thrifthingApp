@@ -26,6 +26,8 @@ class _RegisterPageState extends State<RegisterPage> {
   bool noHp = false;
   bool sandi = false;
 
+  String status = "user";
+
   void postdataUser() async {
     Uri url =
         Uri.parse("http://localhost/restApi_goThrift/users/post_users.php?");
@@ -34,6 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
       'nama_lengkap': txtNama_lengkap.text,
       'no_hp': txtNo_hp.text,
       'kata_sandi': txtKata_sandi.text,
+      'status': "user",
     };
 
     final response = await http.post(url, body: data);

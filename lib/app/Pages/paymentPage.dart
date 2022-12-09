@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import '/app/Pages/home_screen.dart';
 
 class PaymentPage extends StatefulWidget {
@@ -256,7 +257,10 @@ class _PaymentPageState extends State<PaymentPage> {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: ElevatedButton(
               onPressed: () async {
-                final result = await FilePicker.platform.pickFiles();
+                // final result = await FilePicker.platform.pickFiles();
+                final ImagePicker _picker = ImagePicker();
+                final XFile? image =
+                    await _picker.pickImage(source: ImageSource.gallery);
               },
               child: Text(
                 "Upload bukti transfer sekarang",

@@ -50,11 +50,13 @@ class _ProfileBodyState extends State<ProfileBody> {
     setState(() {
       currentId = lastId;
     });
+    print(currentId);
     Uri url = Uri.parse(
         "http://localhost/restApi_goThrift/users/get_users.php?id_user=${currentId.toString()}");
     var response = await http.get(url);
-    if (response.statusCode == 200 || response.statusCode != null) {
-      result = json.decode(response.body)['result'];
+    if (response.statusCode == 200 || response.statusCode != "") {
+      result = jsonDecode(response.body)['result'];
+      // print(result[0]['profile']);
       setState(() {});
     } else {
       print("response status code profile user salah");
@@ -127,9 +129,21 @@ class _ProfileBodyState extends State<ProfileBody> {
                       Row(
                         children: [
                           CircleAvatar(
-                              radius: 30,
-                              backgroundImage: MemoryImage(
-                                  base64Decode(result[index]['profile']))),
+                            radius: 30,
+                            backgroundColor: Color(0xFF9C62FF),
+                            backgroundImage: (result[0]['profile'] != "")
+                                ? MemoryImage(
+                                    base64Decode(result[index]['profile']),
+                                  )
+                                : null,
+                            child: (result[0]['profile'] == "")
+                                ? Icon(
+                                    FontAwesomeIcons.solidUser,
+                                    size: 27,
+                                    color: Colors.white,
+                                  )
+                                : null,
+                          ),
                           Container(
                             margin: const EdgeInsets.only(left: 10),
                             child: Column(

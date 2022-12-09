@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trifthing_apps/app/controllers/controll.dart';
-import 'package:trifthing_apps/app/loadingPages/loadingCheckout.dart';
 import '/app/Pages/checkoutPage.dart';
 
 class DetailProductPage extends StatefulWidget {
@@ -24,6 +23,40 @@ class _DetailProductPageState extends State<DetailProductPage> {
 
   List result = [];
 
+  var resultAlamat;
+  var modelsAlamat;
+  var idKotaPenerima;
+
+  int? stok;
+  int jmlBeli = 1;
+
+  void plus() {
+    setState(() {
+      jmlBeli = jmlBeli + 1;
+    });
+  }
+
+  Future<void> getAlamat() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastId = await Controller1.getCheckIdUser();
+    setState(() {
+      currentId = lastId;
+    });
+    Uri url = Uri.parse(
+        "http://localhost/restApi_goThrift/detail_alamat_user/get_detail_alamat.php?id_user=${currentId.toString()}");
+    final response2 = await http.get(url);
+    if (response2.statusCode == 200) {
+      setState(() {
+        resultAlamat = json.decode(response2.body);
+        modelsAlamat = resultAlamat['result'];
+        idKotaPenerima = modelsAlamat[0]['id_kota'];
+        print(idKotaPenerima);
+      });
+    } else {
+      print("response status code Alamat ceckout salah");
+    }
+  }
+
   getData() async {
     final _baseUrl =
         "http://localhost/restApi_goThrift/produk_user/get_produk_user.php?id_produk=${widget.idProduk.toString()}&id_user=${widget.idUser.toString()}&id_kategori=${widget.idKategori.toString()}";
@@ -31,6 +64,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
     if (response.statusCode == 200) {
       setState(() {
         result = jsonDecode(response.body)[0]['result'];
+        stok = result[0]['stok'];
       });
     } else {
       print("response status code detail produk salah");
@@ -65,6 +99,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
     print("detail id user = ${widget.idUser}");
     print("detail id kat = ${widget.idKategori}");
     ceckUser();
+    getAlamat();
     super.initState();
   }
 
@@ -215,7 +250,8 @@ class _DetailProductPageState extends State<DetailProductPage> {
                           idProduk: result[0]['id_produk'],
                           idUser: result[0]['id_user'],
                           idKat: result[0]['id_kategori'],
-                          idKota: result[0]['id_kota'],
+                          idKotaPengirim: result[0]['id_kota'],
+                          idKotaPenerima: idKotaPenerima.toString(),
                           berat: result[0]['berat'],
                           pengiriman: "pos",
                         ));

@@ -15,7 +15,6 @@ class RepositoryProduk {
       final response = await http.get(Uri.parse(_baseUrl));
       if (response.statusCode == 200) {
         Iterable it = jsonDecode(response.body)[0]['result'];
-        // print(it);
         List<ProdukUser> produk =
             it.map((e) => ProdukUser.fromJson(e)).toList();
         return produk;

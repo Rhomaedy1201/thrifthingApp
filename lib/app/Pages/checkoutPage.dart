@@ -15,7 +15,7 @@ import 'package:http/http.dart' as http;
 class CheckoutPage extends StatefulWidget {
   var idProduk, idUser, idKat;
   var pengiriman;
-  var idKota, berat;
+  var idKotaPengirim, idKotaPenerima, berat;
   DateTime now = DateTime.now();
   CheckoutPage({
     super.key,
@@ -23,7 +23,8 @@ class CheckoutPage extends StatefulWidget {
     this.idUser,
     this.idKat,
     this.pengiriman,
-    this.idKota,
+    this.idKotaPengirim,
+    this.idKotaPenerima,
     this.berat,
   });
 
@@ -35,13 +36,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
   int? totalPembayaran;
 
   DetailsAlamat alamat = DetailsAlamat();
-  var resultAlamat;
-  var modelsAlamat;
-  var idKota;
   String? currentId;
 
   var loading = false;
 
+  var resultAlamat;
+  var modelsAlamat;
+  var idKota;
   Future<void> getAlamat() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? lastId = await Controller1.getCheckIdUser();
@@ -79,18 +80,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   var resultPengiriman;
   getPengiriman() async {
+    getData();
+    getAlamat();
     Uri url = Uri.parse("https://api.rajaongkir.com/starter/cost");
     var dataPengiriman = {
       "key": "d94bc123ecd740dfcfb52e76e0439035",
-      "origin": "${widget.idKota}",
-      "destination": "160",
+      "origin": "${widget.idKotaPengirim}",
+      "destination": "${widget.idKotaPenerima}",
       "weight": "${widget.berat}",
       "courier": "${widget.pengiriman}",
     };
     final response = await http.post(url, body: dataPengiriman);
     resultPengiriman = jsonDecode(response.body);
     if (resultPengiriman['rajaongkir']['status']['code'] == 200) {
-      print(resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost']);
+      // print(resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost']);
+      print(resultPengiriman['rajaongkir']['results'][0]['code']);
       setState(() {});
     } else {
       print("response status code checkout produk salah");
@@ -102,26 +106,37 @@ class _CheckoutPageState extends State<CheckoutPage> {
   int? totalPesan;
   int? subTotalProduk;
   var pengiriman = "pos";
+  var estimasi;
+  var typePegriman;
+  var hargaPengiriman;
+  var estimasiPengiriman;
+  List<int>? convertEstimasi;
+
+  var pembayaran = "bri";
 
   @override
   void initState() {
     print(pengiriman);
-    setState(() {
-      // idKota = modelsAlamat[0]['id_kota'];
-    });
     getAlamat();
     getData();
     getPengiriman();
-    print(widget.idKota);
+    print(widget.idKotaPenerima);
     print(widget.idUser);
     print(widget.berat);
     print(widget.pengiriman);
-    print(idKota);
     Timer(Duration(seconds: 2), () {
       setState(() {
         loading = true;
+        typePegriman =
+            resultPengiriman['rajaongkir']['results'][0]['costs'][0]['service'];
+        hargaPengiriman = resultPengiriman['rajaongkir']['results'][0]['costs']
+            [0]['cost'][0]['value'];
+        estimasiPengiriman = resultPengiriman['rajaongkir']['results'][0]
+            ['costs'][0]['cost'][0]['etd'];
       });
     });
+    setState(() {});
+    print("back");
     super.initState();
   }
 
@@ -421,17 +436,34 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ),
                             InkWell(
                               onTap: () async {
-                                final tes = await Get.to(ShippingOption(
-                                  pengiriman: pengiriman,
-                                ));
+                                // final tes = await Get.to(ShippingOption(
+                                //   pengiriman: pengiriman,
+                                //   idKotaPengirim: widget.idKotaPengirim,
+                                //   idKotaPenerima: widget.idKotaPenerima,
+                                //   berat: widget.berat,
+                                //   kurir: resultPengiriman['rajaongkir']
+                                //       ['results'][0]['code'],
+                                //   typePengiriman: typePegriman,
+                                //   hargaPengiriman: hargaPengiriman,
+                                //   estimasiPengiriman: estimasiPengiriman,
+                                // ));
                                 // final tes = await Navigator.of(context)
                                 //     .push(MaterialPageRoute(
-                                //   builder: (context) =>
-                                //       ShippingOption(pengiriman: widget.pengiriman),
+                                //   builder: (context) => ShippingOption(
+                                //     pengiriman: pengiriman,
+                                //     idKotaPengirim: widget.idKotaPengirim,
+                                //     idKotaPenerima: widget.idKotaPenerima,
+                                //     berat: widget.berat,
+                                //     kurir: resultPengiriman['rajaongkir']
+                                //         ['results'][0]['code'],
+                                //     typePengiriman: typePegriman,
+                                //     hargaPengiriman: hargaPengiriman,
+                                //     estimasiPengiriman: estimasiPengiriman,
+                                //   ),
                                 // ));
-                                setState(() {
-                                  pengiriman = tes;
-                                });
+                                // setState(() {
+                                // pengiriman = tes;
+                                // });
                               },
                               // highlightColor: Colors.purple,
                               child: Container(
@@ -464,16 +496,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              (pengiriman == null)
-                                                  ? "pos".toUpperCase()
-                                                  : pengiriman,
+                                              "$typePegriman",
                                               style: TextStyle(
                                                   fontSize: 16,
                                                   color: Colors.black),
                                             ),
                                             SizedBox(height: 5),
                                             Text(
-                                              "Estimasi pengiriman ${resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['etd']}"
+                                              "Estimasi pengiriman $estimasiPengiriman"
                                                   .capitalize!,
                                               style: TextStyle(
                                                   fontSize: 13,
@@ -484,7 +514,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         Row(
                                           children: [
                                             Text(
-                                              "Rp${resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
+                                              "Rp$hargaPengiriman",
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   color: Colors.black),
@@ -546,7 +576,127 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           color: Color(0xFFF5F5F5),
                         ),
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return SizedBox(
+                                    height: 220,
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 17, vertical: 15),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Metode Pembayaran :",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              SizedBox(height: 20),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    pembayaran = "bri";
+                                                  });
+                                                },
+                                                child: Container(
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color:
+                                                            Color(0xFFC6C6C6),
+                                                        blurRadius: 3,
+                                                        offset: Offset(0,
+                                                            0), // Shadow position
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  padding: EdgeInsets.only(
+                                                      top: 10,
+                                                      bottom: 10,
+                                                      left: 5,
+                                                      right: 10),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            width: 30,
+                                                            height: 30,
+                                                            child: Image(
+                                                              image: AssetImage(
+                                                                  "assets/logo/bri.png"),
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 15),
+                                                          Text(
+                                                            "Bank BRI",
+                                                            style: TextStyle(
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      (pembayaran == "bri")
+                                                          ? Icon(Icons.check,
+                                                              color: Color(
+                                                                  0xFF9C62FF))
+                                                          : Text("")
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Container(
+                                            width: double.infinity,
+                                            height: 45,
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                Get.back();
+                                              },
+                                              child: Text(
+                                                "Pilih",
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    Color(0xFF9C62FF),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ));
+                              },
+                            );
+                          },
                           child: Container(
                             width: bodyWidth * 10,
                             height: 50,
