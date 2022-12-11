@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '/app/Pages/deliveryStatusPage.dart';
 import '/app/Pages/paymentPage.dart';
+import 'package:http/http.dart' as http;
 
 class OrderDetailsPage extends StatefulWidget {
-  const OrderDetailsPage({super.key});
+  var id_alamat_user, id_transaksi;
+  OrderDetailsPage({super.key, this.id_alamat_user, this.id_transaksi});
 
   @override
   State<OrderDetailsPage> createState() => _OrderDetailsPageState();
@@ -14,7 +18,7 @@ class OrderDetailsPage extends StatefulWidget {
 class _OrderDetailsPageState extends State<OrderDetailsPage> {
   String noResi = "";
 
-  SnackBar resiTrue = SnackBar(
+  SnackBar resiTrue = const SnackBar(
     content: Text(
       "No Resi telah tersalin",
       style: TextStyle(
@@ -25,7 +29,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     behavior: SnackBarBehavior.floating,
   );
 
-  SnackBar resiFalse = SnackBar(
+  SnackBar resiFalse = const SnackBar(
     content: Text(
       "No Resi masih belum diupdate oleh penjual!!",
       style: TextStyle(
@@ -35,6 +39,34 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     duration: Duration(seconds: 2),
     behavior: SnackBarBehavior.floating,
   );
+
+  // get transaksi
+  List result = [];
+  Future<void> getTransaksi() async {
+    Uri url = Uri.parse(
+        "http://localhost/restApi_goThrift/transaksi/get_transaksi.php?id_alamat_user=${widget.id_alamat_user}&id_transaksi=${widget.id_transaksi}");
+    var response = await http.get(url);
+    result = json.decode(response.body)['result'];
+    setState(() {});
+    // print(result);
+  }
+
+  // get alamat user
+  var alamat;
+  Future<void> getAlamat() async {
+    Uri url = Uri.parse(
+        "http://localhost/restApi_goThrift/detail_alamat_user/get_detail_alamat.php?id_user=2");
+    var response = await http.get(url);
+    alamat = jsonDecode(response.body)['result'];
+    print(alamat);
+  }
+
+  @override
+  void initState() {
+    getTransaksi();
+    getAlamat();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +78,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         iconTheme: IconThemeData(color: Color(0xFF9C62FF)),
         elevation: 2,
         shadowColor: Color(0xFFF4F1F6),
-        title: Text(
+        title: const Text(
           "Detail Pesanan",
           style: TextStyle(
             color: Color(0xFF414141),
@@ -65,7 +97,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Belum dibayar",
+                      "${result[0]['transaksi'][0]['status']}".capitalizeFirst!,
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -112,7 +144,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           color: Color(0xff727272)),
                     ),
                     Text(
-                      "09 Desember 2022, 14:17 WIB",
+                      "${result[0]['transaksi'][0]['tanggal_beli']}",
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
@@ -142,7 +174,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 ),
                 SizedBox(height: 20),
                 GridView.builder(
-                  itemCount: 1,
+                  itemCount: result.length,
                   itemBuilder: (context, index) {
                     return Container(
                       padding:
@@ -172,8 +204,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                     color: Colors.grey,
                                     borderRadius: BorderRadius.circular(10),
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                          "assets/itemsImage/item1.jpeg"),
+                                      image: MemoryImage(base64Decode(
+                                          "${result[0]['produk'][0]['gambar']}")),
                                       fit: BoxFit.cover,
                                     )),
                               ),
@@ -184,7 +216,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "argument is null, the text will use the style from the closest enclosing ",
+                                      "${result[0]['produk'][0]['nama_produk']}",
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
@@ -194,7 +226,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
-                                      "1 x Rp75.000",
+                                      "1 x Rp${result[0]['produk'][0]['harga']}",
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w400,
@@ -222,7 +254,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                 ),
                               ),
                               Text(
-                                "Rp135.000",
+                                "Rp${result[0]['transaksi'][0]['total_pembayaran']}",
                                 style: TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w800,
@@ -298,7 +330,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "Kurir",
                             style: TextStyle(
                               fontSize: 13,
@@ -306,12 +338,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Container(
                             width: 70,
                             child: InkWell(
                               onTap: () {
-                                (noResi == null || noResi == "")
+                                (result[0]['pengiriman'][0]['no_resi'] ==
+                                            null ||
+                                        result[0]['pengiriman'][0]['no_resi'] ==
+                                            "")
                                     ? ScaffoldMessenger.of(context)
                                         .showSnackBar(resiFalse)
                                     : ScaffoldMessenger.of(context)
@@ -360,7 +395,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "JNE-Reguler",
+                            "${result[0]['pengiriman'][0]['nama_pengiriman']} reguler"
+                                .capitalize!,
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.black,
@@ -369,9 +405,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           ),
                           SizedBox(height: 10),
                           Text(
-                            (noResi == null || noResi == "")
+                            (result[0]['pengiriman'][0]['no_resi'] == null ||
+                                    result[0]['pengiriman'][0]['no_resi'] == "")
                                 ? "- (Penjual belum update No. Resi)"
-                                : noResi,
+                                : "${result[0]['pengiriman'][0]['no_resi']}",
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.black,
@@ -380,8 +417,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           ),
                           SizedBox(height: 10),
                           Text(
-                            "Muhammad Rhomaedi\n085259822977\njln. Mastrip, kel. tegalgede, kec. Sumbersari, RT 87 RW 00\nSUMBERSARI, KAB. JEMBER, JAWA TIMUR 68299",
-                            style: TextStyle(
+                            "${alamat[0]['nama_lengkap_alamat']}\n${alamat[0]['no_hp_alamat']}\n${alamat[0]['detail_jalan']} (${alamat[0]['detail_patokan']})\n" +
+                                "KAB. ${alamat[0]['kota']}, ${alamat[0]['provinsi']} ${alamat[0]['kode_pos']}"
+                                    .toUpperCase(),
+                            style: const TextStyle(
                               fontSize: 13,
                               color: Colors.black,
                               fontWeight: FontWeight.w400,
@@ -424,7 +463,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           color: Color(0xff727272)),
                     ),
                     Text(
-                      "Bank BRI",
+                      "Bank ${result[0]['metode_pembayaran'][0]['nama_bank']}"
+                          .toUpperCase(),
                       style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w300,
@@ -441,14 +481,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Total Harga (1 barang)",
+                      "Total Harga (${result[0]['transaksi'][0]['jumlah_beli']} barang)",
                       style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w300,
                           color: Color(0xff727272)),
                     ),
                     Text(
-                      "Rp75.000",
+                      "Rp${result[0]['produk'][0]['harga']}",
                       style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w300,
@@ -468,7 +508,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           color: Color(0xff727272)),
                     ),
                     Text(
-                      "Rp20.000",
+                      "Rp${result[0]['pengiriman'][0]['harga_pengiriman']}",
                       style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w300,
@@ -493,7 +533,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           color: Colors.black),
                     ),
                     Text(
-                      "Rp95.000",
+                      "Rp${result[0]['transaksi'][0]['total_pembayaran']}",
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,

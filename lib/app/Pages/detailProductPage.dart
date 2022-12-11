@@ -30,12 +30,6 @@ class _DetailProductPageState extends State<DetailProductPage> {
   int? stok;
   int jmlBeli = 1;
 
-  void plus() {
-    setState(() {
-      jmlBeli = jmlBeli + 1;
-    });
-  }
-
   Future<void> getAlamat() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? lastId = await Controller1.getCheckIdUser();
@@ -247,13 +241,14 @@ class _DetailProductPageState extends State<DetailProductPage> {
                     onTap: () {
                       if (cekAddress == true) {
                         Get.to(CheckoutPage(
-                          idProduk: result[0]['id_produk'],
-                          idUser: result[0]['id_user'],
-                          idKat: result[0]['id_kategori'],
+                          idProduk: result[0]['id_produk'].toString(),
+                          idUser: result[0]['id_user'].toString(),
+                          idKat: result[0]['id_kategori'.toString()],
                           idKotaPengirim: result[0]['id_kota'],
-                          idKotaPenerima: idKotaPenerima.toString(),
+                          idKotaPenerima: idKotaPenerima.toString().toString(),
                           berat: result[0]['berat'],
                           pengiriman: "pos",
+                          jmlBeli: jmlBeli.toInt(),
                         ));
                       } else {
                         CoolAlert.show(

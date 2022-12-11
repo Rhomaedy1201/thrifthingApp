@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -15,7 +16,7 @@ import 'package:http/http.dart' as http;
 class CheckoutPage extends StatefulWidget {
   var idProduk, idUser, idKat;
   var pengiriman;
-  var idKotaPengirim, idKotaPenerima, berat;
+  var idKotaPengirim, idKotaPenerima, berat, jmlBeli;
   DateTime now = DateTime.now();
   CheckoutPage({
     super.key,
@@ -26,6 +27,7 @@ class CheckoutPage extends StatefulWidget {
     this.idKotaPengirim,
     this.idKotaPenerima,
     this.berat,
+    this.jmlBeli,
   });
 
   @override
@@ -43,6 +45,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
   var resultAlamat;
   var modelsAlamat;
   var idKota;
+
+  // memanggil alamat pembeli
   Future<void> getAlamat() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? lastId = await Controller1.getCheckIdUser();
@@ -57,12 +61,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
         resultAlamat = json.decode(response2.body);
         modelsAlamat = resultAlamat['result'];
         idKota = modelsAlamat[0]['id_kota'];
+        print(modelsAlamat[0]['id_alamat_user']);
       });
     } else {
       print("response status code Alamat ceckout salah");
     }
   }
 
+  // memanggil data produk
   List result = [];
   Future<void> getData() async {
     Uri url = Uri.parse(
@@ -78,27 +84,96 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
+  // memanggil pengiriman seperti pos
   var resultPengiriman;
   getPengiriman() async {
     getData();
     getAlamat();
     Uri url = Uri.parse("https://api.rajaongkir.com/starter/cost");
-    var dataPengiriman = {
-      "key": "d94bc123ecd740dfcfb52e76e0439035",
+    var data = {
       "origin": "${widget.idKotaPengirim}",
       "destination": "${widget.idKotaPenerima}",
       "weight": "${widget.berat}",
       "courier": "${widget.pengiriman}",
     };
-    final response = await http.post(url, body: dataPengiriman);
+    var dataHeader = {
+      "key": "d94bc123ecd740dfcfb52e76e0439035",
+      "content-type": "application/x-www-form-urlencoded",
+    };
+
+    final response = await http.post(
+      url,
+      headers: dataHeader,
+      body: data,
+    );
     resultPengiriman = jsonDecode(response.body);
+    print(resultPengiriman['rajaongkir']['status']['code']);
     if (resultPengiriman['rajaongkir']['status']['code'] == 200) {
-      // print(resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost']);
       print(resultPengiriman['rajaongkir']['results'][0]['code']);
+      // print(resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]
+      //     ['value']);
       setState(() {});
     } else {
       print("response status code checkout produk salah");
     }
+  }
+
+  // generate id transkasi
+  var idTrans;
+  Future<void> TransaksiId() async {
+    Uri url = Uri.parse(
+        "http://localhost/restApi_goThrift/transaksi/get_idTransaksi.php");
+    var response = await http.get(url);
+    var resultId = json.decode(response.body)['result'][0]['id_transaksi'];
+    idTrans = resultId + 1;
+    print(" t : ${idTrans}");
+  }
+
+  // melakukan transaksi
+  Future<void> postTransaksi() async {
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
+    String datetime = dateFormat.format(DateTime.now());
+
+    Uri url = Uri.parse(
+        "http://localhost/restApi_goThrift/transaksi/pos_transaksi.php");
+    var data = {
+      "id_transaksi": "${idTrans.toString()}",
+      "id_alamat_user": "${modelsAlamat[0]['id_alamat_user']}",
+      "id_pengiriman": "1",
+      "harga_pengiriman":
+          "${resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
+      "no_resi": "",
+      "id_rekening": "${result[0]['id_rekening']}",
+      "total_pembayaran":
+          "${result[0]['harga'] + resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
+      "bukti_pembayaran": "",
+      "tanggal_beli": "$datetime",
+      "tanggal_terima": "",
+      "status": "belum dibayar",
+    };
+
+    var response = await http.post(url, body: data);
+    var hasil = json.decode(response.body);
+    if (hasil[0]['type'] == true) {
+      postDetailTransaksi();
+      Get.offAll(PaymentPage());
+    } else {
+      print("terjadi kesalahan untuk post transaksi");
+    }
+    print(response.body);
+  }
+
+  Future<void> postDetailTransaksi() async {
+    Uri url = Uri.parse(
+        "http://localhost/restApi_goThrift/transaksi/pos_detail_transaksi.php");
+    var data = {
+      "id_transaksi": "${idTrans.toString()}",
+      "id_produk": "${result[0]['id_produk']}",
+      "jumlah": "${widget.jmlBeli}",
+    };
+
+    var response = await http.post(url, body: data);
+    print("post detail : ${response.body}");
   }
 
   int ongkir = 20000;
@@ -108,7 +183,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   var pengiriman = "pos";
   var estimasi;
   var typePegriman;
-  var hargaPengiriman;
+  int? hargaPengiriman;
   var estimasiPengiriman;
   List<int>? convertEstimasi;
 
@@ -116,7 +191,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   void initState() {
-    print(pengiriman);
+    TransaksiId();
     getAlamat();
     getData();
     getPengiriman();
@@ -127,12 +202,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     Timer(Duration(seconds: 2), () {
       setState(() {
         loading = true;
-        typePegriman =
-            resultPengiriman['rajaongkir']['results'][0]['costs'][0]['service'];
-        hargaPengiriman = resultPengiriman['rajaongkir']['results'][0]['costs']
-            [0]['cost'][0]['value'];
-        estimasiPengiriman = resultPengiriman['rajaongkir']['results'][0]
-            ['costs'][0]['cost'][0]['etd'];
       });
     });
     setState(() {});
@@ -195,7 +264,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           borderRadius: BorderRadius.all(Radius.zero)),
                     ),
                     onPressed: () {
-                      Get.offAll(PaymentPage());
+                      postTransaksi();
                     },
                     child: const Text(
                       "Buat Pesanan",
@@ -205,6 +274,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           color: Colors.white),
                     ),
                   ),
+                  // FutureBuilder(
+                  //   future: getPengiriman(),
+                  //   builder: (context, snapshot) {
+                  //     if (snapshot.connectionState == ConnectionState.waiting) {
+                  //       return Expanded(
+                  //         child: Text("laoding..."),
+                  //       );
+                  //     } else if (snapshot.hasData) {
+                  //       return
+                  //     }
+                  //     return Text("Show data");
+                  //   },
+                  // ),
                   Container(
                     padding: EdgeInsets.only(left: 12),
                     child: Column(
@@ -221,7 +303,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          "Rp${result[0]['harga'] + ongkir}",
+                          "Rp${result[0]['harga'] + resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
                           style: const TextStyle(
                               fontSize: 19,
                               fontWeight: FontWeight.w700,
@@ -229,12 +311,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
             body: Container(
-                margin: EdgeInsets.symmetric(vertical: 5),
+                margin: const EdgeInsets.symmetric(vertical: 5),
                 child: ListView.builder(
                   itemCount: result.length,
                   itemBuilder: (context, index) {
@@ -244,7 +326,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           onTap: () {},
                           child: Container(
                             width: double.infinity,
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 horizontal: 15, vertical: 8),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -416,7 +498,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    "x1",
+                                    "x${widget.jmlBeli}",
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w300,
@@ -447,20 +529,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 //   hargaPengiriman: hargaPengiriman,
                                 //   estimasiPengiriman: estimasiPengiriman,
                                 // ));
-                                // final tes = await Navigator.of(context)
-                                //     .push(MaterialPageRoute(
-                                //   builder: (context) => ShippingOption(
-                                //     pengiriman: pengiriman,
-                                //     idKotaPengirim: widget.idKotaPengirim,
-                                //     idKotaPenerima: widget.idKotaPenerima,
-                                //     berat: widget.berat,
-                                //     kurir: resultPengiriman['rajaongkir']
-                                //         ['results'][0]['code'],
-                                //     typePengiriman: typePegriman,
-                                //     hargaPengiriman: hargaPengiriman,
-                                //     estimasiPengiriman: estimasiPengiriman,
-                                //   ),
-                                // ));
+
                                 // setState(() {
                                 // pengiriman = tes;
                                 // });
@@ -496,14 +565,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "$typePegriman",
+                                              "${resultPengiriman['rajaongkir']['results'][0]['costs'][0]['service']}",
                                               style: TextStyle(
                                                   fontSize: 16,
                                                   color: Colors.black),
                                             ),
                                             SizedBox(height: 5),
                                             Text(
-                                              "Estimasi pengiriman $estimasiPengiriman"
+                                              "Estimasi pengiriman ${resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['etd']}"
                                                   .capitalize!,
                                               style: TextStyle(
                                                   fontSize: 13,
@@ -514,7 +583,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         Row(
                                           children: [
                                             Text(
-                                              "Rp$hargaPengiriman",
+                                              "Rp${resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   color: Colors.black),
@@ -554,7 +623,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Total Pesan (1 Produk):",
+                                "Total Pesan (${widget.jmlBeli} Produk):",
                                 style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.black,
@@ -801,7 +870,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     ),
                                   ),
                                   Text(
-                                    "Rp${ongkir}",
+                                    "Rp${resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w300,
@@ -824,7 +893,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     ),
                                   ),
                                   Text(
-                                    "Rp${result[0]['harga'] + ongkir}",
+                                    "Rp${result[0]['harga'] + resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,
