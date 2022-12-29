@@ -62,7 +62,7 @@ class _ShippingOptionState extends State<ShippingOption> {
     print(widget.idKotaPenerima);
     print(widget.berat);
     print(widget.kurir);
-    getPengiriman();
+    // getPengiriman();
     Timer(Duration(seconds: 2), () {
       setState(() {
         loading = true;
@@ -164,6 +164,7 @@ class _ShippingOptionState extends State<ShippingOption> {
                       nextDay = false;
                       regular = true;
                     });
+                    Get.back();
                   },
                   child: Container(
                     color: Colors.white,
@@ -194,12 +195,14 @@ class _ShippingOptionState extends State<ShippingOption> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "${service[0]['service']}",
+                                        // "${service[0]['service']}",
+                                        "asasas",
                                         style: TextStyle(fontSize: 15),
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        "Rp${service[0]['cost'][0]['value']}",
+                                        // "Rp${service[0]['cost'][0]['value']}",
+                                        "zxxx",
                                         style: TextStyle(
                                             fontSize: 16,
                                             color: Color(0xFF7F42E8),
@@ -208,8 +211,8 @@ class _ShippingOptionState extends State<ShippingOption> {
                                     ],
                                   ),
                                   Text(
-                                    "Ekstimasi diterima kurang lebih dari ${service[0]['cost'][0]['etd']}"
-                                        .capitalizeFirst!,
+                                    // "Ekstimasi diterima kurang lebih dari ${service[0]['cost'][0]['etd']}"
+                                    "estimasi".capitalizeFirst!,
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Color(0xff727272),
@@ -268,12 +271,14 @@ class _ShippingOptionState extends State<ShippingOption> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "${service[1]['service']}",
+                                        // "${service[1]['service']}",
+                                        "ss",
                                         style: TextStyle(fontSize: 15),
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        "Rp${service[1]['cost'][0]['value']}",
+                                        // "Rp${service[1]['cost'][0]['value']}",
+                                        "Rp",
                                         style: TextStyle(
                                             fontSize: 16,
                                             color: Color(0xFF7F42E8),
@@ -282,7 +287,8 @@ class _ShippingOptionState extends State<ShippingOption> {
                                     ],
                                   ),
                                   Text(
-                                    "Ekstimasi diterima kurang lebih dari ${service[1]['cost'][0]['etd']}"
+                                    // "Ekstimasi diterima kurang lebih dari ${service[1]['cost'][0]['etd']}"
+                                    "Ekstimasi diterima kurang lebih dari"
                                         .capitalizeFirst!,
                                     style: TextStyle(
                                       fontSize: 14,

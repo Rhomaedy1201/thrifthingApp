@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
+import 'package:trifthing_apps/app/utils/base_url.dart';
 import '/app/auth/login/loginPage.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -29,8 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String status = "user";
 
   void postdataUser() async {
-    Uri url =
-        Uri.parse("http://localhost/restApi_goThrift/users/post_users.php?");
+    Uri url = Uri.parse("$apiPostUser?");
     var data = {
       'email': txtEmail.text,
       'nama_lengkap': txtNama_lengkap.text,

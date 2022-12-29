@@ -4,9 +4,9 @@ import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:trifthing_apps/app/utils/base_url.dart';
 import '/app/controllers/controll.dart';
 import '/app/loadingPages/loadingHome.dart';
-import '/app/repositorys/repo_login.dart';
 import '/app/auth/forget/forgetPasswordPage.dart';
 // import '/app/Pages/home_screen.dart';
 import '/app/auth/register/registerPage.dart';
@@ -23,11 +23,8 @@ class _LoginPageState extends State<LoginPage> {
   var txtEmail = TextEditingController();
   var txtKata_sandi = TextEditingController();
 
-  RepositoryLogin repLog = Get.put(RepositoryLogin());
-
   bool email = false;
   bool sandi = false;
-  RepositoryLogin repoLogin = RepositoryLogin();
 
   @override
   void initState() {
@@ -51,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
   var userData;
   Future<void> loginUser() async {
     Uri url = Uri.parse(
-        "http://localhost/restApi_goThrift/users/login_user.php?email=${txtEmail.text.toString()}&kata_sandi=${txtKata_sandi.text.toString()}");
+        "$apiLoginUser?email=${txtEmail.text.toString()}&kata_sandi=${txtKata_sandi.text.toString()}");
     var response = await http.get(url);
 
     setState(() {

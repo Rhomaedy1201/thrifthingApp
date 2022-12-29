@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:trifthing_apps/app/utils/base_url.dart';
 import '/app/Pages/editAddressPage.dart';
 import '/app/Pages/newAddressPage.dart';
 import 'package:http/http.dart' as http;
@@ -21,8 +22,8 @@ class _MyAddressPageState extends State<MyAddressPage> {
   _MyAddressPageState({this.idUSer});
 
   void getAddress() async {
-    Uri url = Uri.parse(
-        "http://localhost/restApi_goThrift/detail_alamat_user/get_detail_alamat.php?id_user=${widget.idUser.toString()}");
+    Uri url =
+        Uri.parse("$apiGetDetailAlamat?id_user=${widget.idUser.toString()}");
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {

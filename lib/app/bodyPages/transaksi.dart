@@ -1,11 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:trifthing_apps/app/controllers/controll.dart';
-import '/app/Pages/orderDetailsPage.dart';
-import 'package:http/http.dart' as http;
 
 class TransactionBody extends StatelessWidget {
   @override
@@ -14,10 +9,10 @@ class TransactionBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 19),
-            child: Text(
+            margin: const EdgeInsets.symmetric(horizontal: 19),
+            child: const Text(
               "Transaksi",
               style: TextStyle(
                 fontSize: 17,
@@ -25,13 +20,13 @@ class TransactionBody extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Container(
             height: 5,
             color: Color(0xffECEAF3),
             width: double.infinity,
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           // ItemsTransaction()
         ],
       ),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:trifthing_apps/app/utils/base_url.dart';
 import '/app/Pages/displayResultSearch.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,7 +21,7 @@ class _SearchPageState extends State<SearchPage> {
 
   getData() async {
     final _baseUrl =
-        "http://localhost/restApi_goThrift/produk_user/search_produk_user.php?nama_produk=${txtSearch.text.toString()}";
+        "$apiSearchProduk?nama_produk=${txtSearch.text.toString()}";
     final response = await http.get(Uri.parse(_baseUrl));
     if (response.statusCode == 200) {
       result = jsonDecode(response.body)[0]['result'];
@@ -75,6 +76,8 @@ class _SearchPageState extends State<SearchPage> {
             controller: txtSearch,
             textInputAction: TextInputAction.search,
             autofocus: true,
+            autocorrect: false,
+            enableInteractiveSelection: true,
             cursorColor: Color(0xFF9C62FF),
             onSubmitted: (value) {
               getData();
@@ -91,75 +94,79 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
       ),
-      body: Container(
-        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: ListView(
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Terakhir di Cari",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {},
+                      child: Text(
+                        "Hapus Semua",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 17),
+                LastSearch(),
+                LastSearch(),
+                LastSearch(),
+                LastSearch(),
+                LastSearch(),
+                SizedBox(height: 20),
                 Text(
-                  "Terakhir di Cari",
+                  "Kategori Produk",
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                InkWell(
-                  onTap: () {},
-                  child: Text(
-                    "Hapus Semua",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                      fontSize: 12,
-                    ),
-                  ),
+                SizedBox(height: 20),
+                SearchCategory(
+                  bodyWidth: bodyWidth,
+                  icon: 'FontAwesomeIcons.shirt',
+                  title: 'Baju atau kaos',
+                  valueItem: 20,
+                ),
+                SearchCategory(
+                  bodyWidth: bodyWidth,
+                  icon: 'FontAwesomeIcons.shirt',
+                  title: 'Baju atau kaos',
+                  valueItem: 20,
+                ),
+                SearchCategory(
+                  bodyWidth: bodyWidth,
+                  icon: 'FontAwesomeIcons.shirt',
+                  title: 'Baju atau kaos',
+                  valueItem: 20,
+                ),
+                SearchCategory(
+                  bodyWidth: bodyWidth,
+                  icon: 'FontAwesomeIcons.shirt',
+                  title: 'Baju atau kaos',
+                  valueItem: 20,
                 ),
               ],
             ),
-            SizedBox(height: 17),
-            LastSearch(),
-            LastSearch(),
-            LastSearch(),
-            LastSearch(),
-            LastSearch(),
-            SizedBox(height: 20),
-            Text(
-              "Kategori Produk",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 20),
-            SearchCategory(
-              bodyWidth: bodyWidth,
-              icon: 'FontAwesomeIcons.shirt',
-              title: 'Baju atau kaos',
-              valueItem: 20,
-            ),
-            SearchCategory(
-              bodyWidth: bodyWidth,
-              icon: 'FontAwesomeIcons.shirt',
-              title: 'Baju atau kaos',
-              valueItem: 20,
-            ),
-            SearchCategory(
-              bodyWidth: bodyWidth,
-              icon: 'FontAwesomeIcons.shirt',
-              title: 'Baju atau kaos',
-              valueItem: 20,
-            ),
-            SearchCategory(
-              bodyWidth: bodyWidth,
-              icon: 'FontAwesomeIcons.shirt',
-              title: 'Baju atau kaos',
-              valueItem: 20,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

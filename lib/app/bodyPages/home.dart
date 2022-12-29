@@ -1,46 +1,127 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:trifthing_apps/app/Pages/categoryPage.dart';
 import '/app/widgets/categoryProduct.dart';
 import '/app/widgets/itemsRecomendation.dart';
 
-class HomeBody extends StatelessWidget {
+class HomeBody extends StatefulWidget {
+  @override
+  State<HomeBody> createState() => _HomeBodyState();
+}
+
+class _HomeBodyState extends State<HomeBody> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   int valueChat = 0;
+
   int valueCart = 0;
+
   int valueNotification = 0;
+
+  int _current = 0;
+
+  final CarouselController _controller = CarouselController();
+
+  final List<String> imgList = [
+    'assets/images/banner2.webp',
+    'assets/images/banner1.jpeg',
+    'assets/images/banner3.jpeg',
+    'assets/images/banner5.jpeg',
+    'assets/images/banner6.jpeg',
+  ];
 
   @override
   Widget build(BuildContext context) {
     final bodyWidth = MediaQuery.of(context).size.width;
     final mediaQueryHeight = MediaQuery.of(context).size.height;
     final myAppBar = PreferredSize(
-      preferredSize: Size.fromHeight(60),
+      preferredSize: const Size.fromHeight(60),
       child: AppBar(),
     );
     final bodyHeight = mediaQueryHeight -
         myAppBar.preferredSize.height -
         MediaQuery.of(context).padding.top;
     return Container(
-      margin: EdgeInsets.only(top: 10),
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.only(top: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 17),
       child: ListView(
         children: [
           Container(
-            width: bodyWidth * 10,
-            height: bodyHeight * 0.25,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(
-                Radius.circular(15),
-              ),
-              image: DecorationImage(
-                  image: AssetImage('assets/images/banner2.webp'),
-                  fit: BoxFit.fill),
+            child: CarouselSlider(
+              carouselController: _controller,
+              options: CarouselOptions(
+                  autoPlay: true,
+                  enlargeCenterPage: true,
+                  aspectRatio: 1.7,
+                  viewportFraction: 1.0,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _current = index;
+                    });
+                  }),
+              items: imgList
+                  .map((item) => Container(
+                        child: Container(
+                          margin: const EdgeInsets.all(5.0),
+                          child: ClipRRect(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(7.0)),
+                              child: Stack(
+                                children: <Widget>[
+                                  Image(
+                                    image: AssetImage(
+                                      item,
+                                    ),
+                                    fit: BoxFit.cover,
+                                    width: 1000.0,
+                                  ),
+                                  Positioned(
+                                    bottom: 0.0,
+                                    left: 0.0,
+                                    right: 0.0,
+                                    child: Container(
+                                      decoration: const BoxDecoration(),
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 10.0, horizontal: 20.0),
+                                    ),
+                                  ),
+                                ],
+                              )),
+                        ),
+                      ))
+                  .toList(),
             ),
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: imgList.asMap().entries.map((entry) {
+              return GestureDetector(
+                onTap: () => _controller.animateToPage(entry.key),
+                child: Container(
+                  width: 9.0,
+                  height: 8.0,
+                  margin: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 4.0),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : const Color(0xFF6F1CFF))
+                          .withOpacity(_current == entry.key ? 0.9 : 0.4)),
+                ),
+              );
+            }).toList(),
+          ),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 15),
+            margin: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   "Kategori Produk",
                   style: TextStyle(
                     fontSize: 17,
@@ -49,9 +130,13 @@ class HomeBody extends StatelessWidget {
                   ),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Get.to(CategoryPage(
+                      type: true,
+                    ));
+                  },
                   child: Row(
-                    children: [
+                    children: const [
                       Text(
                         "Lihat semua",
                         style: TextStyle(fontSize: 14),
@@ -69,10 +154,10 @@ class HomeBody extends StatelessWidget {
           ),
           CategoryProduct(),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 30),
+            margin: const EdgeInsets.symmetric(vertical: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+              children: const [
                 Text(
                   "Rekomendasi",
                   style: TextStyle(
@@ -85,7 +170,7 @@ class HomeBody extends StatelessWidget {
             ),
           ),
           ItemsRecomendation(),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
         ],
       ),
     );

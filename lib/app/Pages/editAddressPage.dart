@@ -513,9 +513,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
                       ? null
                       : (txtJalan.text == "" || txtPatokan.text == "")
                           ? null
-                          : () {
-                              // postAlamat();
-                            },
+                          : () {},
               child: Container(
                 height: 55,
                 child: Center(
