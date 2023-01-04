@@ -59,8 +59,8 @@ class _LoginPageState extends State<LoginPage> {
         "$apiLoginUser?email=${txtEmail.text.toString()}&kata_sandi=${txtKata_sandi.text.toString()}");
     var response = await http.get(url);
 
+    print(response.body);
     setState(() {
-      print(response.body);
       var convertDataToJson = jsonDecode(response.body);
       userData = (convertDataToJson as List<dynamic>);
       print(userData[0]['type']);
@@ -71,6 +71,17 @@ class _LoginPageState extends State<LoginPage> {
         resetCheckLogin();
         resetCheckIdUser();
         Get.offAll(HomeScreen());
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color(0xFF77E37B),
+            content: Text(
+              'Login Berhasil!',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 15),
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       } else {
         CoolAlert.show(
           context: context,

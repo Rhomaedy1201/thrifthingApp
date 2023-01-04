@@ -61,7 +61,7 @@ class _BuktiPembayaranState extends State<BuktiPembayaran> {
           const SnackBar(
             backgroundColor: Color(0xFF1FA324),
             content: Text(
-              'Berhasil Update bukti pembayaran 🥳👌',
+              'Berhasil Update bukti pembayaran',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 15),
             ),
