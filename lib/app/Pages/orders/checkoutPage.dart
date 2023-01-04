@@ -11,7 +11,7 @@ import 'package:trifthing_apps/app/utils/base_url.dart';
 import 'package:trifthing_apps/app/widgets/big_loading.dart';
 import '/app/controllers/controll.dart';
 import '/app/models/details_alamat_model.dart';
-import '/app/Pages/paymentPage.dart';
+import '../payment/paymentPage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 

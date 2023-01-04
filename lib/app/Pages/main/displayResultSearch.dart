@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import 'package:trifthing_apps/app/Pages/searchPage.dart';
+import 'package:trifthing_apps/app/Pages/main/searchPage.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
 import 'package:trifthing_apps/app/widgets/shimmer_loading_products.dart';
-import '/app/Pages/detailProductPage.dart';
+import 'detailProductPage.dart';
 import 'package:http/http.dart' as http;
 
 class DisplayResultSearch extends StatefulWidget {

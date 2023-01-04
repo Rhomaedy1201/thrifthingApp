@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import '/app/Pages/deliveryStatusPage.dart';
+import '../Pages/orders/deliveryStatusPage.dart';
 
 class LoadingDeliveryStatus extends StatefulWidget {
   const LoadingDeliveryStatus({super.key});

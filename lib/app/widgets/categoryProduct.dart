@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:trifthing_apps/app/Pages/categoryPage.dart';
+import 'package:trifthing_apps/app/Pages/main/categoryPage.dart';
 import 'package:trifthing_apps/app/models/category_modal.dart';
 import 'package:trifthing_apps/app/services/service_category.dart';
 import 'package:trifthing_apps/app/widgets/small_loading.dart';

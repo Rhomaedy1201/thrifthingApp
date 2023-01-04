@@ -4,8 +4,8 @@ import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
-import '/app/Pages/editAddressPage.dart';
-import '/app/Pages/newAddressPage.dart';
+import 'editAddressPage.dart';
+import 'newAddressPage.dart';
 import 'package:http/http.dart' as http;
 
 class MyAddressPage extends StatefulWidget {

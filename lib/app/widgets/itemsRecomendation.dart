@@ -6,7 +6,7 @@ import 'package:trifthing_apps/app/models/model_produk.dart';
 import 'package:trifthing_apps/app/services/service_produk.dart';
 import 'package:trifthing_apps/app/widgets/shimmer_loading_products.dart';
 import 'package:trifthing_apps/app/widgets/small_loading.dart';
-import '/app/Pages/detailProductPage.dart';
+import '../Pages/main/detailProductPage.dart';
 
 class ItemsRecomendation extends StatefulWidget {
   @override

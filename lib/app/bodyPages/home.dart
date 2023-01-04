@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:trifthing_apps/app/Pages/categoryPage.dart';
+import 'package:trifthing_apps/app/Pages/main/categoryPage.dart';
 import '/app/widgets/categoryProduct.dart';
 import '/app/widgets/itemsRecomendation.dart';
 

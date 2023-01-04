@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:trifthing_apps/app/Pages/detailProductPage.dart';
+import 'package:trifthing_apps/app/Pages/main/detailProductPage.dart';
 import 'package:trifthing_apps/app/models/category_modal.dart';
 import 'package:trifthing_apps/app/models/model_produk.dart';
 import 'package:trifthing_apps/app/services/service_category.dart';

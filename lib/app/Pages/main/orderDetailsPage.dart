@@ -13,8 +13,8 @@ import 'package:trifthing_apps/app/controllers/controll.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
 import 'package:trifthing_apps/app/widgets/big_loading.dart';
 import 'package:trifthing_apps/app/widgets/small_loading.dart';
-import '/app/Pages/deliveryStatusPage.dart';
-import '/app/Pages/paymentPage.dart';
+import '../orders/deliveryStatusPage.dart';
+import '../payment/paymentPage.dart';
 import 'package:http/http.dart' as http;
 
 class OrderDetailsPage extends StatefulWidget {

@@ -4,7 +4,7 @@ import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import 'package:trifthing_apps/app/Pages/home_screen.dart';
+import 'package:trifthing_apps/app/Pages/main/home_screen.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
 import 'package:trifthing_apps/app/widgets/small_loading.dart';
 import '/app/controllers/controll.dart';

@@ -1,9 +1,9 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '/app/Pages/cartPage.dart';
+import '../Pages/cart/cartPage.dart';
 import '/app/Pages/notificationPage.dart';
-import '/app/Pages/searchPage.dart';
+import '../Pages/main/searchPage.dart';
 
 class AppBarHome extends StatefulWidget {
   const AppBarHome({super.key});

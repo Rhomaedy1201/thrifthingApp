@@ -13,7 +13,7 @@ import 'package:trifthing_apps/app/controllers/controll.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
 import 'package:trifthing_apps/app/widgets/big_loading.dart';
 import 'package:trifthing_apps/app/widgets/small_loading.dart';
-import '/app/Pages/checkoutPage.dart';
+import '../orders/checkoutPage.dart';
 
 class DetailProductPage extends StatefulWidget {
   var idProduk, idUser, idKategori;
@@ -268,7 +268,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                               height: 46,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(30),
-                                color: Color(0xFF9C62FF),
+                                color: const Color(0xFF9C62FF),
                               ),
                               child: const Center(
                                 child: Text(

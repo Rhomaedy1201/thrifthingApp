@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
-import 'package:trifthing_apps/app/Pages/home_screen.dart';
+import 'package:trifthing_apps/app/Pages/main/home_screen.dart';
 
 class RepositoryLogin {
   var data;

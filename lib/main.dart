@@ -1,7 +1,7 @@
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import '/app/Pages/SplashScreen.dart';
+import 'app/Pages/intro/SplashScreen.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {

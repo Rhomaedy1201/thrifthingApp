@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trifthing_apps/app/auth/login/loginPage.dart';
 import 'package:trifthing_apps/app/controllers/controll.dart';
-import '/app/Pages/home_screen.dart';
-import '/app/Pages/introductionPage.dart';
+import '../main/home_screen.dart';
+import 'introductionPage.dart';
 import 'package:lottie/lottie.dart';
 
 class SplashScreen extends StatefulWidget {

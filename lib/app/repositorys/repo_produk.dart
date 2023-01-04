@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import '/app/Pages/detailProductPage.dart';
+import '../Pages/main/detailProductPage.dart';
 import '/app/models/model_produk.dart';
 
 class RepositoryProduk {

@@ -5,13 +5,13 @@ import 'package:badges/badges.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '/app/controllers/controll.dart';
-import '../Pages/cartPage.dart';
-import '../Pages/notificationPage.dart';
-import '../Pages/transactionPage.dart';
-import '../Pages/wishlistPage.dart';
-import '../bodyPages/profile.dart';
-import '../bodyPages/home.dart';
-import '../Pages/searchPage.dart';
+import '../cart/cartPage.dart';
+import '../notificationPage.dart';
+import '../orders/transactionPage.dart';
+import '../wishlistPage.dart';
+import '../../bodyPages/profile.dart';
+import '../../bodyPages/home.dart';
+import 'searchPage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       color: Color(0xFFEDECF5),
                     ),
-                    width: bodyWidth * 0.9,
+                    width: bodyWidth * 0.8,
                     height: 43,
                     child: Row(
                       children: const <Widget>[
@@ -103,80 +103,81 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(width: 10),
-            // Container(
-            //   width: bodyWidth * 0.26,
-            //   height: 37,
-            //   // color: Colors.red,
-            //   child: Row(
-            //     children: [
-            //       Badge(
-            //         badgeContent: Text(
-            //           "$valueNotification",
-            //           style: TextStyle(color: Colors.white, fontSize: 12),
-            //         ),
-            //         padding: EdgeInsets.all(4),
-            //         badgeColor: Color(0xFF9C62FF),
-            //         showBadge: valueNotification < 1 ? false : true,
-            //         child: InkWell(
-            //           child: const FaIcon(
-            //             FontAwesomeIcons.bell,
-            //             color: Color(0xFF9C9FA8),
-            //             size: 25,
-            //           ),
-            //           onTap: () {
-            //             setState(() {
-            //               Get.to(NotificationPage());
-            //             });
-            //           },
-            //         ),
-            //       ),
-            //       SizedBox(width: 10),
-            //       Badge(
-            //         badgeContent: Text(
-            //           "$valueCart",
-            //           style: TextStyle(color: Colors.white, fontSize: 12),
-            //         ),
-            //         padding: EdgeInsets.all(4),
-            //         badgeColor: Color(0xFF9C62FF),
-            //         // animationType: BadgeAnimationType.slide,
-            //         showBadge: valueCart < 1 ? false : true,
-            //         child: InkWell(
-            //           child: const Icon(
-            //             Icons.shopping_bag_outlined,
-            //             color: Color(0xFF9C9FA8),
-            //             size: 27,
-            //           ),
-            //           onTap: () {
-            //             Get.to(CartPage());
-            //           },
-            //         ),
-            //       ),
-            //       const SizedBox(width: 10),
-            //       Badge(
-            //         badgeContent: Text(
-            //           "$valueChat",
-            //           style: const TextStyle(color: Colors.white, fontSize: 12),
-            //         ),
-            //         padding: const EdgeInsets.all(4),
-            //         badgeColor: const Color(0xFF9C62FF),
-            //         // animationType: BadgeAnimationType.slide,
-            //         showBadge: valueChat < 1 ? false : true,
-            //         child: InkWell(
-            //           child: const FaIcon(
-            //             FontAwesomeIcons.commentDots,
-            //             color: Color(0xFF9C9FA8),
-            //             size: 25,
-            //           ),
-            //           onTap: () {
-            //             setState(() {
-            //               valueChat += 1;
-            //             });
-            //           },
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
+            Container(
+              width: bodyWidth * 0.095,
+              height: 37,
+              // color: Colors.red,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Badge(
+                  //   badgeContent: Text(
+                  //     "$valueNotification",
+                  //     style: TextStyle(color: Colors.white, fontSize: 12),
+                  //   ),
+                  //   padding: EdgeInsets.all(4),
+                  //   badgeColor: Color(0xFF9C62FF),
+                  //   showBadge: valueNotification < 1 ? false : true,
+                  //   child: InkWell(
+                  //     child: const FaIcon(
+                  //       FontAwesomeIcons.bell,
+                  //       color: Color(0xFF9C9FA8),
+                  //       size: 25,
+                  //     ),
+                  //     onTap: () {
+                  //       setState(() {
+                  //         Get.to(NotificationPage());
+                  //       });
+                  //     },
+                  //   ),
+                  // ),
+                  // SizedBox(width: 10),
+                  Badge(
+                    badgeContent: Text(
+                      "$valueCart",
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                    padding: EdgeInsets.all(4),
+                    badgeColor: Color(0xFF9C62FF),
+                    // animationType: BadgeAnimationType.slide,
+                    showBadge: valueCart < 1 ? false : true,
+                    child: InkWell(
+                      child: const Icon(
+                        Icons.shopping_bag_outlined,
+                        color: Color(0xFF9C9FA8),
+                        size: 27,
+                      ),
+                      onTap: () {
+                        Get.to(CartPage());
+                      },
+                    ),
+                  ),
+                  // const SizedBox(width: 10),
+                  // Badge(
+                  //   badgeContent: Text(
+                  //     "$valueChat",
+                  //     style: const TextStyle(color: Colors.white, fontSize: 12),
+                  //   ),
+                  //   padding: const EdgeInsets.all(4),
+                  //   badgeColor: const Color(0xFF9C62FF),
+                  //   // animationType: BadgeAnimationType.slide,
+                  //   showBadge: valueChat < 1 ? false : true,
+                  //   child: InkWell(
+                  //     child: const FaIcon(
+                  //       FontAwesomeIcons.commentDots,
+                  //       color: Color(0xFF9C9FA8),
+                  //       size: 25,
+                  //     ),
+                  //     onTap: () {
+                  //       setState(() {
+                  //         valueChat += 1;
+                  //       });
+                  //     },
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import '/app/Pages/home_screen.dart';
+import '../Pages/main/home_screen.dart';
 
 class LoadingHome extends StatefulWidget {
   const LoadingHome({super.key});

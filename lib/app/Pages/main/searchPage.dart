@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
-import '/app/Pages/displayResultSearch.dart';
+import 'displayResultSearch.dart';
 import 'package:http/http.dart' as http;
 
 class SearchPage extends StatefulWidget {
