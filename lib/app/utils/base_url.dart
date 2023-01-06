@@ -24,3 +24,7 @@ var updateStatusTrans = "$url/transaksi/update_status_transaksi.php";
 var getPengiriman = "$url/API-Pengiriman/pengiriman.php";
 
 var postDetailAlamat = "$url/detail_alamat_user/post_detail_alamat.php";
+
+var getCartApi = "$url/keranjang/get_keranjang.php";
+var deleteCartId = "$url/keranjang/delete_keranjang_id.php";
+var deleteCartAll = "$url/keranjang/delete_keranjang_all.php";
