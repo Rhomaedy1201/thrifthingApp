@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     showBadge: valueCart < 1 ? false : true,
                     child: InkWell(
                       child: const Icon(
-                        Icons.shopping_bag_outlined,
+                        Icons.shopping_cart_outlined,
                         color: Color(0xFF9C9FA8),
                         size: 27,
                       ),

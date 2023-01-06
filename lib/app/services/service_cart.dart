@@ -75,4 +75,40 @@ class ServiceCart {
       log(e.toString());
     }
   }
+
+  Future<bool?> addToCart({
+    required String idProduk,
+    required String idPembeli,
+    required String idPenjual,
+    required String jumlah,
+    required String total,
+  }) async {
+    bool? result;
+
+    var response = await http.post(
+      Uri.parse("$postCart"),
+      body: {
+        'id_produk': idProduk,
+        'id_user_pembeli': idPembeli,
+        'id_user_penjual': idPenjual,
+        'jumlah': jumlah,
+        'total': total,
+      },
+    );
+
+    print(response.body);
+    try {
+      if (response.statusCode == 200) {
+        result = await json.decode(response.body)[0]['type'];
+
+        return result;
+      } else {
+        log(response.statusCode.toString());
+      }
+
+      return result;
+    } catch (e) {
+      log(e.toString());
+    }
+  }
 }

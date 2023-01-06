@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trifthing_apps/app/Pages/orders/checkoutPage.dart';
 import 'package:trifthing_apps/app/controllers/controll.dart';
 import 'package:trifthing_apps/app/models/cart_modal.dart';
 import 'package:trifthing_apps/app/services/service_cart.dart';
@@ -45,6 +47,7 @@ class _CartPageState extends State<CartPage> {
   List<CartModal> resultCart = [];
   bool isLoading = false;
   int subTotal = 0;
+  int subBerat = 0;
   Future<void> getProductCart() async {
     setState(() {
       isLoading = true;
@@ -58,13 +61,21 @@ class _CartPageState extends State<CartPage> {
 
     resultCart = await ServiceCart().getCart(id_user_pembeli: "$currendId");
 
-    setState(() {
+    if (resultCart.length > 0) {
+      int total = 0;
+      int berat = 0;
       for (var i = 0; i < resultCart.length; i++) {
-        subTotal += resultCart[i].total!;
+        total += resultCart[i].total!;
+        subTotal = total;
+        // sub total berat
+        berat += resultCart[i].berat!;
+        subBerat = berat;
       }
-    });
+    } else {
+      subTotal = 0;
+    }
 
-    print(subTotal);
+    print("$subBerat");
 
     setState(() {
       isLoading = false;
@@ -150,7 +161,12 @@ class _CartPageState extends State<CartPage> {
               width: 220,
               height: 60,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Get.to(CheckoutPage(
+                    idKotaPengirim: resultCart[0].id_kota_penjual,
+                    berat: subBerat,
+                  ));
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF9C62FF),
                   shape: RoundedRectangleBorder(
@@ -312,6 +328,7 @@ class _CartPageState extends State<CartPage> {
                             ),
                             content: const Text(
                               "Apakah kamu yakin ingin menhapus barang ini ?",
+                              textAlign: TextAlign.center,
                             ),
                             actions: [
                               TextButton(

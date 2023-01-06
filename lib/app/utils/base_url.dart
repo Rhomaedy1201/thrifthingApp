@@ -28,3 +28,4 @@ var postDetailAlamat = "$url/detail_alamat_user/post_detail_alamat.php";
 var getCartApi = "$url/keranjang/get_keranjang.php";
 var deleteCartId = "$url/keranjang/delete_keranjang_id.php";
 var deleteCartAll = "$url/keranjang/delete_keranjang_all.php";
+var postCart = "$url/keranjang/post_keranjang.php";

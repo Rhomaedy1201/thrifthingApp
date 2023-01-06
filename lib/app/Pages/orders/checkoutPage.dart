@@ -7,8 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trifthing_apps/app/models/cart_modal.dart';
+import 'package:trifthing_apps/app/services/service_cart.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
 import 'package:trifthing_apps/app/widgets/big_loading.dart';
+import 'package:trifthing_apps/app/widgets/small_loading.dart';
 import '/app/controllers/controll.dart';
 import '/app/models/details_alamat_model.dart';
 import '../payment/paymentPage.dart';
@@ -16,20 +19,12 @@ import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 
 class CheckoutPage extends StatefulWidget {
-  var idProduk, idUser, idKat;
-  var pengiriman;
-  var idKotaPengirim, idKotaPenerima, berat, jmlBeli;
+  var idKotaPengirim, berat;
   DateTime now = DateTime.now();
   CheckoutPage({
     super.key,
-    this.idProduk,
-    this.idUser,
-    this.idKat,
-    this.pengiriman,
     this.idKotaPengirim,
-    this.idKotaPenerima,
     this.berat,
-    this.jmlBeli,
   });
 
   @override
@@ -37,43 +32,47 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  int? totalPembayaran;
-
-  DetailsAlamat alamat = DetailsAlamat();
-  String? currentId;
-
   bool isLoading = false;
+  bool loadingProductFromCart = false;
 
-  List resultAlamat = [];
-  var idKota;
+  List<CartModal> resultFromCart = [];
+  int subTotal = 0;
+  int subJumlahBeli = 0;
 
-  // memanggil data produk
-  List result = [];
-  Future<void> getData() async {
+  Future<void> getProductCart() async {
     setState(() {
-      isLoading = true;
+      loadingProductFromCart = true;
     });
 
-    try {
-      Uri url = Uri.parse(
-          "$apiProdukUser?id_produk=${widget.idProduk.toString()}&id_user=${widget.idUser.toString()}&id_kategori=${widget.idKat.toString()}");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastId = await Controller1.getCheckIdUser();
 
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        setState(() {
-          result = jsonDecode(response.body)[0]['result'];
-        });
-      } else {
-        print("response status code checkout produk salah");
+    resultFromCart = await ServiceCart().getCart(id_user_pembeli: "$lastId");
+
+    if (resultFromCart.length > 0) {
+      int total = 0;
+      int jumlah = 0;
+      for (var i = 0; i < resultFromCart.length; i++) {
+        // sub total harga produk
+        total += resultFromCart[i].total!;
+        subTotal = total;
+        // sub jumlah beli
+        jumlah += resultFromCart[i].jumlah!;
+        subJumlahBeli = jumlah;
       }
-    } catch (e) {
-      log("produk $e");
+    } else {
+      subTotal = 0;
     }
 
     setState(() {
-      isLoading = false;
+      loadingProductFromCart = false;
     });
   }
+
+  String? currentId;
+
+  List resultAlamat = [];
+  var idKota;
 
   bool loadingPengiriman = false;
 
@@ -108,15 +107,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
     setState(() {
       loadingPengiriman = true;
     });
-
     try {
       // get pengiriman
       Uri url2 = Uri.parse("https://api.rajaongkir.com/starter/cost");
       var data = {
         "origin": "${widget.idKotaPengirim}",
         "destination": "$idKota",
-        "weight": "${widget.berat}",
-        "courier": "${widget.pengiriman}",
+        "weight": "${1500}",
+        "courier": "pos",
       };
       var dataHeader = {
         "key": "d94bc123ecd740dfcfb52e76e0439035",
@@ -169,23 +167,31 @@ class _CheckoutPageState extends State<CheckoutPage> {
     });
   }
 
+  bool loadingTransaksi = false;
   // melakukan transaksi
   Future<void> postTransaksi() async {
     DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     String datetime = dateFormat.format(DateTime.now());
 
+    setState(() {
+      loadingTransaksi = true;
+    });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastId = await Controller1.getCheckIdUser();
+
     try {
       Uri url = Uri.parse("$apiPostTransaksi");
       var data = {
         "id_transaksi": "${idTrans.toString()}",
-        "id_alamat_user": "${resultAlamat[0]['id_alamat_user']}",
+        "id_alamat_user": "$lastId",
         "id_pengiriman": "1",
         "harga_pengiriman":
             "${resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
         "no_resi": "",
-        "id_rekening": "${result[0]['id_rekening']}",
+        "id_rekening": "1",
         "total_pembayaran":
-            "${result[0]['harga'] + resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
+            "${subTotal + resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value']}",
         "bukti_pembayaran": "",
         "tanggal_beli": "$datetime",
         "tanggal_terima": "",
@@ -198,7 +204,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         postDetailTransaksi();
         Get.offAll(PaymentPage(
           idTransaksi: idTrans.toString(),
-          id_alamat_penerima: resultAlamat[0]['id_alamat_user'],
+          id_alamat_penerima: "$lastId",
         ));
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -217,6 +223,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
     } catch (e) {
       log("pos trans $e");
     }
+
+    setState(() {
+      loadingTransaksi = false;
+    });
   }
 
   Future<void> postDetailTransaksi() async {
@@ -224,8 +234,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       Uri url = Uri.parse("$apiPostDetailTransaksi");
       var data = {
         "id_transaksi": "${idTrans.toString()}",
-        "id_produk": "${result[0]['id_produk']}",
-        "jumlah": "${widget.jmlBeli}",
+        "id_produk": "${1}",
+        "jumlah": "${1}",
       };
 
       var response = await http.post(url, body: data);
@@ -239,7 +249,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
   int? hargaBr;
   int? totalPesan;
   int? subTotalProduk;
-  var pengiriman = "pos";
   var estimasi;
   var typePegriman;
   int? hargaPengiriman;
@@ -250,13 +259,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   void initState() {
+    getProductCart();
     TransaksiId();
-    getData();
     getPengiriman();
     // print(widget.idKotaPenerima);
     // print(widget.idUser);
     // print(widget.berat);
-    // print(widget.pengiriman);
     super.initState();
   }
 
@@ -364,19 +372,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
 
     Widget produkItem() {
-      return ListView.builder(
-        shrinkWrap: true,
-        itemCount: result.length,
-        physics: const ClampingScrollPhysics(),
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 10,
-                color: const Color(0xFFF5F5F5),
-              ),
-              Container(
+      return Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 10,
+            color: const Color(0xFFF5F5F5),
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: 1,
+            physics: const ClampingScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Container(
                 width: bodyWidth * 10,
                 height: 40,
                 color: Colors.white,
@@ -389,7 +397,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      result[index]['nama_lengkap'],
+                      // result[index]['nama_lengkap'],
+                      "Nama Penjual",
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
@@ -398,8 +407,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                   ],
                 ),
-              ),
-              Container(
+              );
+            },
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: resultFromCart.length,
+            physics: const ClampingScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Container(
                 height: 100,
                 width: bodyWidth * 10,
                 color: const Color(0xFFF5F5F5),
@@ -416,7 +432,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           color: Colors.white,
                           child: Image(
                             image: MemoryImage(
-                              base64.decode(result[index]['gambar']),
+                              base64.decode(resultFromCart[index].gambar!),
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -432,14 +448,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                result[index]['nama_produk'],
+                                resultFromCart[index].namaProduk!,
                                 style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w300,
                                 ),
                               ),
                               Text(
-                                "Rp${NumberFormat('#,###,000').format(result[index]['harga'])}"
+                                "Rp${NumberFormat('#,###,000').format(resultFromCart[index].harga)}"
                                     .replaceAll(",", "."),
                                 style: const TextStyle(
                                     fontSize: 16,
@@ -455,7 +471,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          "x${widget.jmlBeli}",
+                          "x${resultFromCart[index].jumlah}",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w300,
@@ -465,10 +481,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     )
                   ],
                 ),
-              ),
-            ],
-          );
-        },
+              );
+            },
+          ),
+        ],
       );
     }
 
@@ -597,7 +613,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     children: [
                                       Text(
                                         "${resultPengiriman['rajaongkir']['results'][index]['costs'][0]['service']}",
-                                        // "",
                                         style: const TextStyle(
                                           fontSize: 16,
                                           color: Colors.black,
@@ -607,7 +622,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       Text(
                                         "Estimasi pengiriman ${resultPengiriman['rajaongkir']['results'][index]['costs'][0]['cost'][0]['etd']}"
                                             .capitalize!,
-                                        // "",
                                         style: const TextStyle(
                                             fontSize: 13,
                                             color: Color(0xff727272)),
@@ -690,7 +704,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ? loadingTotalProduk()
           : ListView.builder(
               shrinkWrap: true,
-              itemCount: result.length,
+              itemCount: 1,
               physics: const ClampingScrollPhysics(),
               itemBuilder: (context, index) {
                 return Column(
@@ -709,14 +723,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Total Pesan (${widget.jmlBeli} Produk):",
+                            "Total Pesan (${subJumlahBeli} Produk):",
                             style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
                                 fontWeight: FontWeight.w400),
                           ),
                           Text(
-                            "Rp${NumberFormat('#,###,000').format(result[index]['harga'])}"
+                            "Rp${NumberFormat('#,###,000').format(subTotal)}"
                                 .replaceAll(",", "."),
                             style: const TextStyle(
                                 fontSize: 18,
@@ -989,7 +1003,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ? loadingRincianPembayaran()
               : ListView.builder(
                   shrinkWrap: true,
-                  itemCount: result.length,
+                  itemCount: 1,
                   physics: const ClampingScrollPhysics(),
                   itemBuilder: (context, index) {
                     return Container(
@@ -1026,7 +1040,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                               ),
                               Text(
-                                "Rp${NumberFormat('#,###,000').format(result[index]['harga'])}"
+                                "Rp${NumberFormat('#,###,000').format(subTotal)}"
                                     .replaceAll(",", "."),
                                 style: const TextStyle(
                                   fontSize: 13,
@@ -1051,7 +1065,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               Text(
                                 "Rp${NumberFormat('#,###,000').format(resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value'])}"
                                     .replaceAll(",", "."),
-                                // "",
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w300,
@@ -1073,7 +1086,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                               ),
                               Text(
-                                "Rp${NumberFormat('#,###,000').format(result[index]['harga'] + resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value'])}"
+                                "Rp${NumberFormat('#,###,000').format(subTotal + resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value'])}"
                                     .replaceAll(",", "."),
                                 style: const TextStyle(
                                   fontSize: 18,
@@ -1177,67 +1190,75 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                   ],
                 ),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: result.length,
-                  physics: const ClampingScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF9C62FF),
-                            minimumSize: const Size(180, 65),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(20),
-                              ),
-                            ),
-                          ),
-                          onPressed: () {
-                            postTransaksi();
-                          },
-                          child: const Text(
-                            "Buat Pesanan",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white),
-                          ),
-                        ),
-                        loadingPengiriman
-                            ? loadingBottomBar()
-                            : Container(
-                                padding: const EdgeInsets.only(left: 12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 10),
-                                    const Text(
-                                      "Total Pembayaran",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF585858),
+                child: loadingProductFromCart
+                    ? const SmallLoadingWidget()
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: 1,
+                        physics: const ClampingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              loadingTransaksi
+                                  ? const SmallLoadingWidget()
+                                  : ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF9C62FF),
+                                        minimumSize: const Size(180, 65),
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(20),
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        postTransaksi();
+                                      },
+                                      child: const Text(
+                                        "Buat Pesanan",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white),
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "Rp${result[index]['harga'] + resultPengiriman['rajaongkir']['results'][index]['costs'][0]['cost'][0]['value']}",
-                                      style: const TextStyle(
-                                          fontSize: 19,
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xFF9C62FF)),
+                              loadingPengiriman
+                                  ? loadingBottomBar()
+                                  : Container(
+                                      padding: const EdgeInsets.only(left: 12),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 10),
+                                          const Text(
+                                            "Total Pembayaran",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                              color: Color(0xFF585858),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            "Rp${NumberFormat('#,###').format(subTotal + resultPengiriman['rajaongkir']['results'][index]['costs'][0]['cost'][0]['value'])}"
+                                                .replaceAll(",", "."),
+                                            style: const TextStyle(
+                                                fontSize: 19,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF9C62FF)),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                      ],
-                    );
-                  },
-                )),
+                            ],
+                          );
+                        },
+                      )),
             body: Container(
               margin: const EdgeInsets.symmetric(vertical: 5),
               child: SingleChildScrollView(

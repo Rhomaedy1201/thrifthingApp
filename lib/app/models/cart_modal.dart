@@ -11,6 +11,8 @@ class CartModal {
     this.harga,
     this.stok,
     this.gambar,
+    this.berat,
+    this.id_kota_penjual,
   });
 
   String? idKeranjang;
@@ -24,6 +26,8 @@ class CartModal {
   int? harga;
   int? stok;
   String? gambar;
+  int? berat;
+  String? id_kota_penjual;
 
   factory CartModal.fromJson(Map<String, dynamic> json) => CartModal(
         idKeranjang: json["id_keranjang"],
@@ -37,6 +41,8 @@ class CartModal {
         harga: json["harga"],
         stok: json["stok"],
         gambar: json["gambar"],
+        berat: json["berat"],
+        id_kota_penjual: json["id_kota_penjual"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -51,5 +57,7 @@ class CartModal {
         "harga": harga,
         "stok": stok,
         "gambar": gambar,
+        "berat": berat,
+        "id_kota_penjual": id_kota_penjual,
       };
 }
