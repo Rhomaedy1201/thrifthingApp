@@ -34,11 +34,12 @@ class _TransactionPageState extends State<TransactionPage> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? lastId = await Controller1.getCheckIdUser();
-    var currentId = lastId;
-    Uri url = Uri.parse("$apiGetTransaksi?id_alamat_user=${currentId}");
+    Uri url = Uri.parse("$apiGetTransaksi?id_user=${lastId}");
     var response = await http.get(url);
     responseData = jsonDecode(response.body);
     result = responseData['result'];
+
+    for (var i = 0; i < result.length; i++) {}
 
     setState(() {
       isLoading = false;
@@ -66,7 +67,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 Column(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 18),
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
                       child: (responseData['code'] == 400)
                           ? Container(
                               margin:
@@ -74,7 +75,7 @@ class _TransactionPageState extends State<TransactionPage> {
                               child: Column(
                                 children: [
                                   Container(
-                                    margin: EdgeInsets.all(10),
+                                    margin: const EdgeInsets.all(10),
                                     width: double.infinity,
                                     height: 300,
                                     child: Lottie.asset(
@@ -154,7 +155,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                       ],
                                     ),
                                     child: Container(
-                                      margin: EdgeInsets.symmetric(
+                                      margin: const EdgeInsets.symmetric(
                                           horizontal: 10, vertical: 10),
                                       child: Column(
                                         crossAxisAlignment:
@@ -173,13 +174,13 @@ class _TransactionPageState extends State<TransactionPage> {
                                                 children: [
                                                   Row(
                                                     children: [
-                                                      Icon(
+                                                      const Icon(
                                                         Icons
                                                             .shopping_cart_checkout_outlined,
                                                         color: Colors.amber,
                                                         size: 25,
                                                       ),
-                                                      SizedBox(width: 8),
+                                                      const SizedBox(width: 8),
                                                       Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -188,7 +189,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                                             MainAxisAlignment
                                                                 .center,
                                                         children: [
-                                                          Text(
+                                                          const Text(
                                                             "Belanja",
                                                             style: TextStyle(
                                                               fontSize: 10,
@@ -200,8 +201,9 @@ class _TransactionPageState extends State<TransactionPage> {
                                                             ),
                                                           ),
                                                           Text(
-                                                            "${DateFormat("dd-MMM-yyyy HH:mm").format(DateTime.parse(result[index]['transaksi'][0]['tanggal_beli']))}",
-                                                            style: TextStyle(
+                                                            "${DateFormat("dd-MMM-yyyy HH:mm").format(DateTime.parse(result[index]['tanggal_beli']))}",
+                                                            style:
+                                                                const TextStyle(
                                                               fontSize: 10,
                                                               fontWeight:
                                                                   FontWeight
@@ -216,43 +218,39 @@ class _TransactionPageState extends State<TransactionPage> {
                                                   ),
                                                   Container(
                                                     height: 25,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7),
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 7),
                                                     decoration: BoxDecoration(
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               5),
-                                                      color: (result[index]['transaksi']
-                                                                          [0][
+                                                      color: (result[index][
                                                                       'status'] ==
                                                                   'belum dibayar' ||
                                                               result[index][
-                                                                          'transaksi']
-                                                                      [0] ==
+                                                                      'status'] ==
                                                                   'pembayaran dikonfirmasi')
-                                                          ? Color(0xFFF6ECCF)
-                                                          : Color(0x4F10DF28),
+                                                          ? const Color(
+                                                              0xFFF6ECCF)
+                                                          : const Color(
+                                                              0x4F10DF28),
                                                     ),
                                                     child: Center(
                                                       child: Text(
-                                                        "${result[index]['transaksi'][0]['status']}"
+                                                        "${result[index]['status']}"
                                                             .capitalizeFirst!,
                                                         style: TextStyle(
                                                           fontSize: 10,
-                                                          color: (result[index]['transaksi']
-                                                                              [
-                                                                              0]
-                                                                          [
+                                                          color: (result[index][
                                                                           'status'] ==
                                                                       'belum dibayar' ||
                                                                   result[index][
-                                                                              'transaksi']
-                                                                          [0] ==
+                                                                          'status'] ==
                                                                       'pembayaran dikonfirmasi')
-                                                              ? Color(
+                                                              ? const Color(
                                                                   0xFFFFAA00)
-                                                              : Color(
+                                                              : const Color(
                                                                   0xFF048D44),
                                                           fontWeight:
                                                               FontWeight.w600,
@@ -262,71 +260,81 @@ class _TransactionPageState extends State<TransactionPage> {
                                                   ),
                                                 ],
                                               ),
-                                              Divider(
+                                              const Divider(
                                                 color: Color(0xFFC2C2C2),
                                               ),
-                                              SizedBox(height: 2),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    height: 35,
-                                                    width: 35,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
-                                                      color: Colors.white,
-                                                      image: DecorationImage(
-                                                        image: MemoryImage(
-                                                            base64Decode(
-                                                                "${result[index]['produk'][0]['gambar']}")),
-                                                        repeat: ImageRepeat
-                                                            .noRepeat,
-                                                        fit: BoxFit.contain,
+                                              const SizedBox(height: 2),
+                                              ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: 1,
+                                                itemBuilder: (context, index) {
+                                                  return Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 35,
+                                                        width: 35,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(7),
+                                                          color: Colors.white,
+                                                          // image: DecorationImage(
+                                                          //   image: MemoryImage(
+                                                          //       base64Decode(
+                                                          //           "${result[index]['produk'][0]['gambar']}")),
+                                                          //   repeat: ImageRepeat
+                                                          //       .noRepeat,
+                                                          //   fit: BoxFit.contain,
+                                                          // ),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    margin: EdgeInsets.only(
-                                                        left: 8),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          "${result[index]['produk'][0]['nama_produk']}",
-                                                          style: TextStyle(
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700),
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                      Container(
+                                                        margin: const EdgeInsets
+                                                            .only(left: 8),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              // "${result2[index]['nama_produk']}",
+                                                              "Nama produk",
+                                                              style: const TextStyle(
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700),
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                            Text(
+                                                              // "${result[index]['transaksi'][0]['jumlah_beli']} Barang",
+                                                              "2 barang",
+                                                              style: const TextStyle(
+                                                                  fontSize: 10,
+                                                                  color: Color(
+                                                                      0xff727272)),
+                                                            ),
+                                                          ],
                                                         ),
-                                                        Text(
-                                                          "${result[index]['transaksi'][0]['jumlah_beli']} Barang",
-                                                          style: TextStyle(
-                                                              fontSize: 10,
-                                                              color: Color(
-                                                                  0xff727272)),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              )
                                             ],
                                           ),
                                           Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
+                                              const Text(
                                                 "Total Belanja",
                                                 style: TextStyle(
                                                     fontSize: 10,
@@ -334,11 +342,11 @@ class _TransactionPageState extends State<TransactionPage> {
                                                     fontWeight:
                                                         FontWeight.w300),
                                               ),
-                                              SizedBox(height: 2),
+                                              const SizedBox(height: 2),
                                               Text(
-                                                "Rp ${NumberFormat('#,###').format(result[index]['transaksi'][0]['total_pembayaran'])}"
+                                                "Rp ${NumberFormat('#,###').format(result[index]['total_pembayaran'])}"
                                                     .replaceAll(",", "."),
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     fontSize: 11,
                                                     fontWeight:
                                                         FontWeight.bold),
@@ -352,14 +360,14 @@ class _TransactionPageState extends State<TransactionPage> {
                                 );
                               },
                               gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 1,
                                 mainAxisSpacing: 15,
                                 childAspectRatio: 10 / 3.7,
                               ),
                               shrinkWrap: true,
                               primary: false,
-                              physics: ScrollPhysics(),
+                              physics: const ScrollPhysics(),
                             ),
                     ),
                   ],

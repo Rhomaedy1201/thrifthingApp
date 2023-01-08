@@ -38,6 +38,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   List<CartModal> resultFromCart = [];
   int subTotal = 0;
   int subJumlahBeli = 0;
+  String? namaPenjual;
 
   Future<void> getProductCart() async {
     setState(() {
@@ -48,6 +49,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     String? lastId = await Controller1.getCheckIdUser();
 
     resultFromCart = await ServiceCart().getCart(id_user_pembeli: "$lastId");
+    namaPenjual = resultFromCart[0].nama_penjual;
 
     if (resultFromCart.length > 0) {
       int total = 0;
@@ -113,7 +115,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       var data = {
         "origin": "${widget.idKotaPengirim}",
         "destination": "$idKota",
-        "weight": "${1500}",
+        "weight": "${widget.berat}",
         "courier": "pos",
       };
       var dataHeader = {
@@ -203,7 +205,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       if (hasil[0]['type'] == true) {
         postDetailTransaksi();
         Get.offAll(PaymentPage(
-          idTransaksi: idTrans.toString(),
+          idTransaksi: "$idTrans",
           id_alamat_penerima: "$lastId",
         ));
         ScaffoldMessenger.of(context).showSnackBar(
@@ -229,31 +231,53 @@ class _CheckoutPageState extends State<CheckoutPage> {
     });
   }
 
+  bool loadingDetailTrans = false;
   Future<void> postDetailTransaksi() async {
-    try {
-      Uri url = Uri.parse("$apiPostDetailTransaksi");
-      var data = {
-        "id_transaksi": "${idTrans.toString()}",
-        "id_produk": "${1}",
-        "jumlah": "${1}",
-      };
+    setState(() {
+      loadingDetailTrans = true;
+    });
 
-      var response = await http.post(url, body: data);
-      print("post detail : ${response.body}");
-    } catch (e) {
-      log("post detail $e");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastId = await Controller1.getCheckIdUser();
+
+    List<CartModal> resultLoop =
+        await ServiceCart().getCart(id_user_pembeli: "$lastId");
+
+    for (var i = 0; i < resultLoop.length; i++) {
+      try {
+        Uri url = Uri.parse("$apiPostDetailTransaksi");
+        var data = {
+          "id_transaksi": "${idTrans}",
+          "id_produk": "${resultLoop[i].idProduk}",
+          "jumlah": "${resultLoop[i].jumlah}",
+        };
+
+        var response = await http.post(url, body: data);
+        print("post detail : ${response.body}");
+      } catch (e) {
+        log("post detail $e");
+      }
     }
+    _deleteAllFromCart();
+
+    setState(() {
+      loadingDetailTrans = false;
+    });
   }
 
-  int ongkir = 20000;
-  int? hargaBr;
-  int? totalPesan;
-  int? subTotalProduk;
-  var estimasi;
-  var typePegriman;
-  int? hargaPengiriman;
-  var estimasiPengiriman;
-  List<int>? convertEstimasi;
+  bool loadingDeleteAll = false;
+  Future<void> _deleteAllFromCart() async {
+    setState(() {
+      loadingDeleteAll = true;
+    });
+
+    bool? deleteAllCart =
+        await ServiceCart().deleteAllCart(idKeranjang: "$currentId");
+
+    setState(() {
+      loadingDeleteAll = false;
+    });
+  }
 
   var pembayaran = "bri";
 
@@ -372,120 +396,124 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
 
     Widget produkItem() {
-      return Column(
-        children: [
-          Container(
-            width: double.infinity,
-            height: 10,
-            color: const Color(0xFFF5F5F5),
-          ),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: 1,
-            physics: const ClampingScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Container(
-                width: bodyWidth * 10,
-                height: 40,
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.storefront_outlined,
-                      color: Color(0xFF636363),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      // result[index]['nama_lengkap'],
-                      "Nama Penjual",
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
+      return loadingProductFromCart
+          ? const SmallLoadingWidget()
+          : Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 10,
+                  color: const Color(0xFFF5F5F5),
                 ),
-              );
-            },
-          ),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: resultFromCart.length,
-            physics: const ClampingScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Container(
-                height: 100,
-                width: bodyWidth * 10,
-                color: const Color(0xFFF5F5F5),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 60,
-                          height: double.infinity,
-                          color: Colors.white,
-                          child: Image(
-                            image: MemoryImage(
-                              base64.decode(resultFromCart[index].gambar!),
-                            ),
-                            fit: BoxFit.cover,
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: 1,
+                  physics: const ClampingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      width: bodyWidth * 10,
+                      height: 40,
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.storefront_outlined,
+                            color: Color(0xFF636363),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Container(
-                          width: 250,
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          const SizedBox(width: 10),
+                          Text(
+                            "$namaPenjual",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: resultFromCart.length,
+                  physics: const ClampingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      height: 100,
+                      width: bodyWidth * 10,
+                      color: const Color(0xFFF5F5F5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
                             children: [
-                              Text(
-                                resultFromCart[index].namaProduk!,
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w300,
+                              Container(
+                                width: 60,
+                                height: double.infinity,
+                                color: Colors.white,
+                                child: Image(
+                                  image: MemoryImage(
+                                    base64
+                                        .decode(resultFromCart[index].gambar!),
+                                  ),
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                              Text(
-                                "Rp${NumberFormat('#,###,000').format(resultFromCart[index].harga)}"
-                                    .replaceAll(",", "."),
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w300,
-                                    color: Color(0xff727272)),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              Container(
+                                width: 250,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 5),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      resultFromCart[index].namaProduk!,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Rp${NumberFormat('#,###,000').format(resultFromCart[index].harga)}"
+                                          .replaceAll(",", "."),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w300,
+                                          color: Color(0xff727272)),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "x${resultFromCart[index].jumlah}",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                "x${resultFromCart[index].jumlah}",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ],
-      );
+              ],
+            );
     }
 
     Widget loadingOpsiPengiriman() {

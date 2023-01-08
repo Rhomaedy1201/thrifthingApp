@@ -111,4 +111,26 @@ class ServiceCart {
       log(e.toString());
     }
   }
+
+  Future<bool?> deleteAllCart({required String idKeranjang}) async {
+    bool? result;
+    var response = await http.delete(
+      Uri.parse("$deleteCartAll?id_user_pembeli=$idKeranjang"),
+    );
+
+    print(response.body);
+    try {
+      if (response.statusCode == 200) {
+        result = await json.decode(response.body)[0]['type'];
+
+        return result;
+      } else {
+        log(response.statusCode.toString());
+      }
+
+      return result;
+    } catch (e) {
+      log(e.toString());
+    }
+  }
 }

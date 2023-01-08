@@ -28,7 +28,10 @@ class OrderDetailsPage extends StatefulWidget {
 class _OrderDetailsPageState extends State<OrderDetailsPage> {
   @override
   void initState() {
+    print(widget.id_alamat_user);
+    print(widget.id_transaksi);
     getTransaksi();
+    _getOnlyProduk();
     getAlamat();
     super.initState();
   }
@@ -59,6 +62,22 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     behavior: SnackBarBehavior.floating,
   );
 
+  List resultProduk = [];
+  Future<void> _getOnlyProduk() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    Uri url = Uri.parse(
+        "$getTransaksiOnlyProduk?id_transaksi=${widget.id_transaksi}&id_user=${widget.id_alamat_user}");
+    var response = await http.get(url);
+    resultProduk = json.decode(response.body)['result'];
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   // get transaksi
   List result = [];
   Future<void> getTransaksi() async {
@@ -67,7 +86,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     });
 
     Uri url = Uri.parse(
-        "$apiGetTransaksi?id_alamat_user=${widget.id_alamat_user}&id_transaksi=${widget.id_transaksi}");
+        "$apiGetTransaksi?id_transaksi=${widget.id_transaksi}&id_user=${widget.id_alamat_user}");
     var response = await http.get(url);
     result = json.decode(response.body)['result'];
 
@@ -139,11 +158,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           physics: const ClampingScrollPhysics(),
                           itemBuilder: (context, index) {
                             return ElevatedButton(
-                              onPressed: result[index]['transaksi'][0]
-                                              ['status'] ==
+                              onPressed: result[index]['status'] ==
                                           "Diproses" ||
-                                      result[index]['transaksi'][0]['status'] ==
-                                          "Dikirim"
+                                      result[index]['status'] == "Dikirim"
                                   ? resultUpdateStatus == "Diterima"
                                       ? null
                                       : () {
@@ -206,7 +223,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 "Detail Pesanan",
                 style: TextStyle(
                   color: Color(0xFF414141),
-                  fontSize: 22,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -234,19 +251,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "${result[index]['transaksi'][0]['status']}"
+                                      "${result[index]['status']}"
                                           .capitalizeFirst!,
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
                                           color: Colors.black),
                                     ),
-                                    result[index]['transaksi'][0]['status'] !=
-                                            "Sudah dibayar"
+                                    result[index]['status'] != "Sudah dibayar"
                                         ? Container()
-                                        : result[index]['transaksi'][0]
-                                                    ['status'] ==
-                                                "Diproses"
+                                        : result[index]['status'] == "Diproses"
                                             ? Container()
                                             : const Text(
                                                 "Menunggu confirmasi penjual",
@@ -263,7 +277,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                       idTransaksi:
                                           "${result[index]['id_transaksi']}",
                                       id_alamat_penerima:
-                                          "${result[index]['id_alamat_user']}",
+                                          "${result[index]['id_user']}",
                                     ));
                                   },
                                   child: Row(
@@ -301,7 +315,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                       color: Color(0xff727272)),
                                 ),
                                 Text(
-                                  "${DateFormat("dd-MMM-yyyy HH:mm").format(DateTime.parse(result[index]['transaksi'][0]['tanggal_beli']))}",
+                                  "${DateFormat("dd-MMM-yyyy HH:mm").format(DateTime.parse(result[index]['tanggal_beli']))}",
                                   style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
@@ -334,7 +348,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         ),
                         const SizedBox(height: 20),
                         GridView.builder(
-                          itemCount: result.length,
+                          itemCount: resultProduk.length,
                           itemBuilder: (context, index) {
                             return Container(
                               padding: const EdgeInsets.symmetric(
@@ -363,14 +377,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                         width: 55,
                                         height: 55,
                                         decoration: BoxDecoration(
-                                            color: Colors.grey,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            image: DecorationImage(
-                                              image: MemoryImage(base64Decode(
-                                                  "${result[0]['produk'][0]['gambar']}")),
-                                              fit: BoxFit.cover,
-                                            )),
+                                          color: Colors.grey,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          image: DecorationImage(
+                                            image: MemoryImage(base64Decode(
+                                                "${resultProduk[index]['produk'][0]['gambar']}")),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                       ),
                                       Container(
                                         width: 240,
@@ -382,7 +397,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "${result[0]['produk'][0]['nama_produk']}",
+                                              "${resultProduk[index]['produk'][0]['nama_produk']}",
                                               style: const TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w700,
@@ -392,7 +407,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             Text(
-                                              "1 x Rp${NumberFormat('#,###').format(result[0]['produk'][0]['harga'])}"
+                                              "${resultProduk[index]['transaksi'][0]['jumlah_beli']} x Rp${NumberFormat('#,###').format(resultProduk[index]['produk'][0]['harga'])}"
                                                   .replaceAll(",", "."),
                                               style: const TextStyle(
                                                 fontSize: 13,
@@ -422,7 +437,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                         ),
                                       ),
                                       Text(
-                                        "Rp${NumberFormat('#,###').format(result[0]['transaksi'][0]['total_pembayaran'])}"
+                                        "Rp${NumberFormat('#,###').format(resultProduk[index]['produk'][0]['harga'] * resultProduk[index]['transaksi'][0]['jumlah_beli'])}"
                                             .replaceAll(",", "."),
                                         style: const TextStyle(
                                           fontSize: 13.5,
@@ -440,7 +455,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 1,
                             mainAxisSpacing: 15,
-                            childAspectRatio: 7 / 2.55,
+                            childAspectRatio: 7 / 2.45,
                           ),
                           shrinkWrap: true,
                           primary: false,
@@ -520,11 +535,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                         width: 70,
                                         child: InkWell(
                                           onTap: () {
-                                            (result[index]['pengiriman'][0]
-                                                            ['no_resi'] ==
-                                                        null ||
-                                                    result[index]['pengiriman']
-                                                            [0]['no_resi'] ==
+                                            (result[index]['no_resi'] == null ||
+                                                    result[index]['no_resi'] ==
                                                         "")
                                                 ? ScaffoldMessenger.of(context)
                                                     .showSnackBar(resiFalse)
@@ -577,7 +589,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "${result[index]['pengiriman'][0]['nama_pengiriman']} reguler"
+                                              "${result[index]['nama_pengiriman']} reguler"
                                                   .capitalize!,
                                               style: const TextStyle(
                                                 fontSize: 13,
@@ -587,15 +599,13 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                             ),
                                             const SizedBox(height: 10),
                                             Text(
-                                              (result[index]['pengiriman'][0]
-                                                              ['no_resi'] ==
+                                              (result[index]['no_resi'] ==
                                                           null ||
                                                       result[index]
-                                                                  ['pengiriman']
-                                                              [0]['no_resi'] ==
+                                                              ['no_resi'] ==
                                                           "")
                                                   ? "- (Penjual belum update No. Resi)"
-                                                  : "${result[index]['pengiriman'][0]['no_resi']}",
+                                                  : "${result[index]['no_resi']}",
                                               style: const TextStyle(
                                                 fontSize: 13,
                                                 color: Colors.black,
@@ -658,7 +668,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                       color: Color(0xff727272)),
                                 ),
                                 Text(
-                                  "Bank ${result[index]['metode_pembayaran'][0]['nama_bank']}"
+                                  "Bank ${result[index]['nama_bank']}"
                                       .toUpperCase(),
                                   style: const TextStyle(
                                       fontSize: 13,
@@ -676,14 +686,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Total Harga (${result[index]['transaksi'][0]['jumlah_beli']} barang)",
+                                  "Total Harga (${result[index]['jml_barang']} barang)",
                                   style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w300,
                                       color: Color(0xff727272)),
                                 ),
                                 Text(
-                                  "Rp${NumberFormat('#,###').format(result[index]['produk'][0]['harga'])}"
+                                  "Rp ${NumberFormat('#,###').format(result[index]['subTotal'] - result[index]['harga_pengiriman'])}"
                                       .replaceAll(",", "."),
                                   style: const TextStyle(
                                       fontSize: 13,
@@ -704,7 +714,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                       color: Color(0xff727272)),
                                 ),
                                 Text(
-                                  "Rp${NumberFormat('#,###').format(result[index]['pengiriman'][0]['harga_pengiriman'])}"
+                                  "Rp ${NumberFormat('#,###').format(result[index]['harga_pengiriman'])}"
                                       .replaceAll(",", "."),
                                   style: const TextStyle(
                                       fontSize: 13,
@@ -730,7 +740,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                       color: Colors.black),
                                 ),
                                 Text(
-                                  "Rp${NumberFormat('#,###').format(result[index]['transaksi'][0]['total_pembayaran'])}"
+                                  "Rp${NumberFormat('#,###').format(result[index]['subTotal'])}"
                                       .replaceAll(",", "."),
                                   style: const TextStyle(
                                       fontSize: 16,

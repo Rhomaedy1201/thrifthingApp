@@ -29,3 +29,7 @@ var getCartApi = "$url/keranjang/get_keranjang.php";
 var deleteCartId = "$url/keranjang/delete_keranjang_id.php";
 var deleteCartAll = "$url/keranjang/delete_keranjang_all.php";
 var postCart = "$url/keranjang/post_keranjang.php";
+
+var getTransaksiOnlyProduk = "$url/transaksi/get_only_transaksi.php";
+
+var deleteDetailTrans = "$url/transaksi/delete_detaiil_transaksi.php";

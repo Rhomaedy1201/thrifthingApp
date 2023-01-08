@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
 import 'package:trifthing_apps/app/widgets/big_loading.dart';
 import 'buktiPembayaran.dart';
@@ -37,21 +36,40 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   var noRekening;
-  DateTime dt = DateTime.now();
   bool isLoading = false;
 
+  int? tgl;
   // get transaksi
   List result = [];
   Future<void> getTransaksi() async {
+    DateFormat dateFormat = DateFormat("dd");
+    String day = dateFormat.format(DateTime.now());
     setState(() {
       isLoading = true;
     });
 
     try {
       Uri url = Uri.parse(
-          "$apiGetTransaksi?id_alamat_user=${widget.id_alamat_penerima}&id_transaksi=${widget.idTransaksi}");
+          "$apiGetTransaksi?id_transaksi=${widget.idTransaksi}&id_user=${widget.id_alamat_penerima}");
       var response = await http.get(url);
       result = json.decode(response.body)['result'];
+      print(response.body);
+      var cek =
+          DateFormat("dd").format(DateTime.parse(result[0]['tanggal_beli']));
+      tgl = int.parse(cek) + 1;
+
+      if (int.parse(day) >= tgl! && result[0]['status'] == "belum dibayar") {
+        Uri url2 = Uri.parse(
+            "$deleteDetailTrans?id_transaksi=${result[0]['id_transaksi']}");
+        var response2 = await http.delete(url2);
+        print(response2.body);
+      } else {
+        print("gausah hapus karena sudah dibayar");
+      }
+      print("cek $cek");
+      print("cek2 $tgl");
+      print("$day");
+      print("${result[0]['status']}");
     } catch (e) {
       log(e.toString());
     }
@@ -99,7 +117,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 itemBuilder: (context, index) {
                   return Column(
                     children: [
-                      (result[index]['transaksi'][0]['bukti_pembayaran'] == "")
+                      (result[index]['bukti_pembayaran'] == "")
                           ? Container()
                           : Container(
                               width: double.infinity,
@@ -165,7 +183,7 @@ class _PaymentPageState extends State<PaymentPage> {
                                     color: Colors.black),
                               ),
                               Text(
-                                "Rp ${NumberFormat('#,###,000').format(result[index]['transaksi'][0]['total_pembayaran'])}"
+                                "Rp ${NumberFormat('#,###,000').format(result[index]['subTotal'])}"
                                     .replaceAll(",", "."),
                                 style: TextStyle(
                                     fontSize: 30,
@@ -263,7 +281,7 @@ class _PaymentPageState extends State<PaymentPage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "${result[index]['metode_pembayaran'][0]['nama_bank']}"
+                                          "${result[index]['nama_bank']}"
                                               .toUpperCase(),
                                           style: const TextStyle(
                                             fontSize: 16,
@@ -273,14 +291,14 @@ class _PaymentPageState extends State<PaymentPage> {
                                         ),
                                         const SizedBox(height: 12),
                                         Text(
-                                          "No. Rekening: ${result[index]['metode_pembayaran'][0]['no_rekening']}",
+                                          "No. Rekening: ${result[index]['no_rekening']}",
                                           style: const TextStyle(
                                             fontSize: 15,
                                           ),
                                         ),
                                         const SizedBox(height: 3),
                                         Text(
-                                          "Nama pemilik: ${result[index]['metode_pembayaran'][0]['nama_pemilik_bank']}",
+                                          "Nama pemilik: ${result[index]['nama_pemilik_bank']}",
                                           style: TextStyle(
                                             fontSize: 15,
                                           ),
@@ -346,13 +364,16 @@ class _PaymentPageState extends State<PaymentPage> {
                               ),
                             ),
                             SizedBox(width: 10),
-                            Text(
-                              "Silahkan upload bukti transfer sebelum tanggal:\n${dt.day + 1}-${dt.month}-${dt.year} ${dt.hour}:${dt.minute}",
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xff727272),
-                                  fontWeight: FontWeight.w400),
-                            )
+                            result[index]['tanggal_beli'] == null
+                                ? Text(
+                                    "Silahkan upload bukti transfer sebelum tanggal:")
+                                : Text(
+                                    "Silahkan upload bukti transfer sebelum tanggal:\n$tgl${DateFormat("-MMM-yyyy HH:mm").format(DateTime.parse(result[index]['tanggal_beli']))}",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        color: Color(0xff727272),
+                                        fontWeight: FontWeight.w400),
+                                  )
                           ],
                         ),
                       ),
@@ -367,9 +388,7 @@ class _PaymentPageState extends State<PaymentPage> {
                             ));
                           },
                           child: Text(
-                            (result[index]['transaksi'][0]
-                                        ['bukti_pembayaran'] !=
-                                    "")
+                            (result[index]['bukti_pembayaran'] != "")
                                 ? "Lihat bukti transfer"
                                 : "Upload bukti transfer sekarang",
                             style: TextStyle(
@@ -394,8 +413,7 @@ class _PaymentPageState extends State<PaymentPage> {
                             Get.back();
                           },
                           child: Text(
-                            (result[0]['transaksi'][0]['bukti_pembayaran'] !=
-                                    "")
+                            (result[0]['bukti_pembayaran'] != "")
                                 ? "Kembali ke home"
                                 : "Upload bukti transfer nanti",
                             style: TextStyle(

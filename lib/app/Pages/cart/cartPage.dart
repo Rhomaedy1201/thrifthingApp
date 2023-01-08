@@ -161,12 +161,14 @@ class _CartPageState extends State<CartPage> {
               width: 220,
               height: 60,
               child: ElevatedButton(
-                onPressed: () {
-                  Get.to(CheckoutPage(
-                    idKotaPengirim: resultCart[0].id_kota_penjual,
-                    berat: subBerat,
-                  ));
-                },
+                onPressed: resultType == false
+                    ? null
+                    : () {
+                        Get.to(CheckoutPage(
+                          idKotaPengirim: resultCart[0].id_kota_penjual,
+                          berat: subBerat,
+                        ));
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF9C62FF),
                   shape: RoundedRectangleBorder(

@@ -10,8 +10,10 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trifthing_apps/app/Pages/cart/cartPage.dart';
 import 'package:trifthing_apps/app/Pages/main/searchPage.dart';
 import 'package:trifthing_apps/app/controllers/controll.dart';
+import 'package:trifthing_apps/app/models/cart_modal.dart';
 import 'package:trifthing_apps/app/services/service_cart.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
 import 'package:trifthing_apps/app/widgets/big_loading.dart';
@@ -35,6 +37,25 @@ class _DetailProductPageState extends State<DetailProductPage> {
   int? stok;
   int jmlBeli = 1;
 
+  int valueInCart = 0;
+
+  Future<void> getValueCart() async {
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastId = await Controller1.getCheckIdUser();
+
+    List<CartModal> valueCart =
+        await ServiceCart().getCart(id_user_pembeli: "${lastId}");
+
+    valueInCart = valueCart.length;
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   getData() async {
     setState(() {
       isLoading = true;
@@ -44,7 +65,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
       final _baseUrl =
           "$apiProdukUser?id_produk=${widget.idProduk.toString()}&id_user=${widget.idUser.toString()}&id_kategori=${widget.idKategori.toString()}";
       final response = await http.get(Uri.parse(_baseUrl));
-      print(response.body);
+      // print(response.body);
       if (response.statusCode == 200) {
         result = jsonDecode(response.body)[0]['result'];
         stok = result[0]['stok'];
@@ -94,6 +115,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
     );
 
     if (resultToCart == true) {
+      getValueCart();
       showDialog(
         context: context,
         barrierColor: Colors.transparent,
@@ -143,6 +165,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
 
   @override
   void initState() {
+    getValueCart();
     getData();
     print("detail id = ${widget.idProduk}");
     print("detail id user = ${widget.idUser}");
@@ -182,7 +205,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                       ),
                       color: Color(0xFFEDECF5),
                     ),
-                    width: bodyWidth * 0.81,
+                    width: bodyWidth * 0.73,
                     height: 43,
                     child: Row(
                       children: const <Widget>[
@@ -205,6 +228,36 @@ class _DetailProductPageState extends State<DetailProductPage> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(width: 10),
+            Container(
+              width: bodyWidth * 0.095,
+              height: 37,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Badge(
+                    badgeContent: Text(
+                      "$valueInCart",
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                    padding: EdgeInsets.all(4),
+                    badgeColor: Color(0xFF9C62FF),
+                    // animationType: BadgeAnimationType.slide,
+                    showBadge: valueInCart < 1 ? false : true,
+                    child: InkWell(
+                      child: const Icon(
+                        Icons.shopping_cart_outlined,
+                        color: Color(0xFF9C9FA8),
+                        size: 27,
+                      ),
+                      onTap: () {
+                        Get.to(CartPage());
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -236,80 +289,89 @@ class _DetailProductPageState extends State<DetailProductPage> {
               ),
               child: isLoading
                   ? const SmallLoadingWidget()
-                  : Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 18, vertical: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Total:",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xFF828282),
-                                  ),
-                                ),
-                                Text(
-                                  "Rp${NumberFormat('#,###').format(result[0]['harga'] * jmlBeli)}"
-                                      .replaceAll(",", "."),
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF414141),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Row(
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: result.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              InkWell(
-                                onTap: () {
-                                  postToCart();
-                                },
-                                child: Container(
-                                  width: bodyWidth / 1.8,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF9C62FF),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Center(
-                                      child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Icon(
-                                        Icons.add_shopping_cart_outlined,
-                                        size: 26,
-                                        color: Colors.white,
+                              Container(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      "Total:",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF828282),
                                       ),
-                                      SizedBox(width: 7),
-                                      Text(
-                                        "Tambah ke Keranjang",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                    ),
+                                    Text(
+                                      "Rp${NumberFormat('#,###').format(result[index]['harga'] * jmlBeli)}"
+                                          .replaceAll(",", "."),
+                                      style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF414141),
                                       ),
-                                    ],
-                                  )),
+                                    ),
+                                  ],
                                 ),
+                              ),
+                              Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      postToCart();
+                                    },
+                                    child: Container(
+                                      width: bodyWidth / 1.8,
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 13),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF9C62FF),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Center(
+                                          child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: const [
+                                          Icon(
+                                            Icons.add_shopping_cart_outlined,
+                                            size: 26,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(width: 7),
+                                          Text(
+                                            "Tambah ke Keranjang",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
+                        );
+                      }),
             ),
             body: RefreshIndicator(
               onRefresh: () async {
                 getData();
+                getValueCart();
               },
               child: ListView.builder(
                 itemCount: result.length,
@@ -321,8 +383,8 @@ class _DetailProductPageState extends State<DetailProductPage> {
                         height: bodyHeight * 0.40,
                         color: Color(0xFFE0E0E0),
                         child: Image(
-                          image:
-                              MemoryImage(base64.decode(result[0]['gambar'])),
+                          image: MemoryImage(
+                              base64.decode(result[index]['gambar'])),
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -343,7 +405,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    result[0]['nama_kategori'],
+                                    result[index]['nama_kategori'],
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -371,7 +433,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                 ],
                               ),
                               Text(
-                                result[0]['nama_produk'],
+                                result[index]['nama_produk'],
                                 style: const TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w800,
@@ -379,7 +441,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                 ),
                               ),
                               Text(
-                                "Rp ${NumberFormat('#,###,000').format(result[0]['harga'])}"
+                                "Rp ${NumberFormat('#,###,000').format(result[index]['harga'])}"
                                     .replaceAll(",", "."),
                                 style: const TextStyle(
                                   fontSize: 16,
@@ -432,7 +494,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                       ),
                                       const SizedBox(width: 15),
                                       Text(
-                                        "${result[0]['terjual']} Terjual",
+                                        "${result[index]['terjual']} Terjual",
                                         style: const TextStyle(fontSize: 12),
                                       ),
                                     ],
@@ -477,19 +539,21 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                           ),
                                         ),
                                         InkWell(
-                                          onTap: jmlBeli == result[0]['stok']
-                                              ? null
-                                              : () {
-                                                  setState(() {
-                                                    jmlBeli += 1;
-                                                  });
-                                                },
+                                          onTap:
+                                              jmlBeli == result[index]['stok']
+                                                  ? null
+                                                  : () {
+                                                      setState(() {
+                                                        jmlBeli += 1;
+                                                      });
+                                                    },
                                           child: Icon(
                                             Icons.add,
                                             size: 18.5,
-                                            color: jmlBeli == result[0]['stok']
-                                                ? const Color(0xFFB8B8B8)
-                                                : const Color(0xFF9C62FF),
+                                            color:
+                                                jmlBeli == result[index]['stok']
+                                                    ? const Color(0xFFB8B8B8)
+                                                    : const Color(0xFF9C62FF),
                                           ),
                                         ),
                                       ],
@@ -514,14 +578,14 @@ class _DetailProductPageState extends State<DetailProductPage> {
                             Row(
                               children: [
                                 CircleAvatar(
-                                    backgroundImage: MemoryImage(
-                                        base64Decode(result[0]['profile']))),
+                                    backgroundImage: MemoryImage(base64Decode(
+                                        result[index]['profile']))),
                                 const SizedBox(width: 10),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      result[0]['nama_lengkap'],
+                                      result[index]['nama_lengkap'],
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),
@@ -537,9 +601,10 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                           size: 16,
                                         ),
                                         Text(
-                                          (result[0]['kota'] == null)
+                                          (result[index]['kota'] == null)
                                               ? "Almat Kosong"
-                                              : result[0]['kota'].toString(),
+                                              : result[index]['kota']
+                                                  .toString(),
                                           style: const TextStyle(
                                               fontSize: 12,
                                               color: Color(0xff727272)),
@@ -678,7 +743,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "${result[0]['stok']}",
+                                              "${result[index]['stok']}",
                                               style: const TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xff727272),
@@ -686,11 +751,12 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                             ),
                                             SizedBox(height: 10),
                                             Text(
-                                              (result[0]['kondisi'] == "" ||
-                                                      result[0]['kondisi'] ==
+                                              (result[index]['kondisi'] == "" ||
+                                                      result[index]
+                                                              ['kondisi'] ==
                                                           null)
                                                   ? "-"
-                                                  : result[0]['kondisi'],
+                                                  : result[index]['kondisi'],
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xff727272),
@@ -698,11 +764,11 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                             ),
                                             SizedBox(height: 10),
                                             Text(
-                                              (result[0]['bahan'] == "" ||
-                                                      result[0]['bahan'] ==
+                                              (result[index]['bahan'] == "" ||
+                                                      result[index]['bahan'] ==
                                                           null)
                                                   ? "-"
-                                                  : result[0]['bahan'],
+                                                  : result[index]['bahan'],
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xff727272),
@@ -710,11 +776,11 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                             ),
                                             SizedBox(height: 10),
                                             Text(
-                                              (result[0]['merek'] == "" ||
-                                                      result[0]['merek'] ==
+                                              (result[index]['merek'] == "" ||
+                                                      result[index]['merek'] ==
                                                           null)
                                                   ? "-"
-                                                  : result[0]['merek'],
+                                                  : result[index]['merek'],
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xff727272),
@@ -722,11 +788,11 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                             ),
                                             SizedBox(height: 10),
                                             Text(
-                                              (result[0]['ukuran'] == "" ||
-                                                      result[0]['ukuran'] ==
+                                              (result[index]['ukuran'] == "" ||
+                                                      result[index]['ukuran'] ==
                                                           null)
                                                   ? "-"
-                                                  : result[0]['ukuran'],
+                                                  : result[index]['ukuran'],
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xff727272),
@@ -734,7 +800,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                             ),
                                             SizedBox(height: 10),
                                             Text(
-                                              "${result[0]['berat'] / 1000} kg",
+                                              "${result[index]['berat'] / 1000} kg",
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xff727272),
@@ -742,11 +808,11 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                             ),
                                             SizedBox(height: 10),
                                             Text(
-                                              (result[0]['motif'] == "" ||
-                                                      result[0]['motif'] ==
+                                              (result[index]['motif'] == "" ||
+                                                      result[index]['motif'] ==
                                                           null)
                                                   ? "-"
-                                                  : result[0]['motif'],
+                                                  : result[index]['motif'],
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xff727272),
@@ -754,7 +820,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                             ),
                                             SizedBox(height: 10),
                                             Text(
-                                              "KOTA ${result[0]['kota']} - ${result[0]['kecamatan']} - ${result[0]['provinsi']}"
+                                              "KOTA ${result[index]['kota']} - ${result[index]['kecamatan']} - ${result[index]['provinsi']}"
                                                   .toUpperCase(),
                                               style: TextStyle(
                                                 fontSize: 12,
@@ -774,10 +840,10 @@ class _DetailProductPageState extends State<DetailProductPage> {
                               Text("Deskripsi"),
                               Divider(color: Color(0xFFC6C6C6), height: 30),
                               Text(
-                                (result[0]['deskripsi'] == "" ||
-                                        result[0]['deskripsi'] == null)
+                                (result[index]['deskripsi'] == "" ||
+                                        result[index]['deskripsi'] == null)
                                     ? "-"
-                                    : result[0]['deskripsi'],
+                                    : result[index]['deskripsi'],
                                 style: TextStyle(
                                   color: Color(0xff727272),
                                   fontSize: 13,

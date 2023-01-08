@@ -57,16 +57,71 @@ class _BuktiPembayaranState extends State<BuktiPembayaran> {
       // print(response.body);
       if (response.body[0]['type'] == true) {
         Get.back();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Color(0xFF1FA324),
-            content: Text(
-              'Berhasil Update bukti pembayaran',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15),
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
+        showDialog(
+          context: context,
+          barrierColor: Colors.transparent,
+          builder: (context) {
+            Future.delayed(
+              const Duration(seconds: 2),
+              () {
+                Get.back();
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.transparent,
+                  builder: (context) {
+                    Future.delayed(
+                      const Duration(seconds: 1),
+                      () {
+                        Get.back();
+                      },
+                    );
+                    return AlertDialog(
+                      backgroundColor: Color(0x890F0F0F),
+                      actions: [
+                        Column(
+                          children: [
+                            Container(
+                              width: 270,
+                              height: 50,
+                              child: Lottie.asset(
+                                  "assets/lottie/iconAlert/icon-success2.json"),
+                            ),
+                            const SizedBox(height: 7),
+                            const Text(
+                              "Berhasil Update Bukti Pembayaran",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFFDEDEDE),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        )
+                      ],
+                    );
+                  },
+                );
+              },
+            );
+            return AlertDialog(
+              backgroundColor: Color(0x00FFFFFF),
+              elevation: 0,
+              actions: [
+                Column(
+                  children: [
+                    Container(
+                      width: 700,
+                      height: 700,
+                      child: Lottie.asset(
+                          "assets/lottie/iconAlert/happy-success.json"),
+                    ),
+                  ],
+                )
+              ],
+            );
+          },
         );
       } else {
         print("gagal merubah bukti pembayaran");
@@ -88,7 +143,7 @@ class _BuktiPembayaranState extends State<BuktiPembayaran> {
 
     try {
       Uri url = Uri.parse(
-          "$apiGetTransaksi?id_alamat_user=${widget.id_alamat_user}&id_transaksi=${widget.id_tansaksi}");
+          "$apiGetTransaksi?id_transaksi=${widget.id_tansaksi}&id_user=${widget.id_alamat_user}");
       var response = await http.get(url);
       result = json.decode(response.body)['result'];
     } catch (e) {
@@ -161,8 +216,7 @@ class _BuktiPembayaranState extends State<BuktiPembayaran> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        (result[index]['transaksi'][0]['bukti_pembayaran'] !=
-                                "")
+                        (result[index]['bukti_pembayaran'] != "")
                             ? const Icon(
                                 Icons.check_circle,
                                 size: 45,
@@ -199,9 +253,7 @@ class _BuktiPembayaranState extends State<BuktiPembayaran> {
                             decoration: BoxDecoration(
                               color: const Color(0xFFF2F1F2),
                               borderRadius: BorderRadius.circular(10),
-                              image: (result[index]['transaksi'][0]
-                                          ['bukti_pembayaran'] !=
-                                      "")
+                              image: (result[index]['bukti_pembayaran'] != "")
                                   ? image != null
                                       ? DecorationImage(
                                           image: FileImage(image!),
@@ -210,8 +262,7 @@ class _BuktiPembayaranState extends State<BuktiPembayaran> {
                                       : DecorationImage(
                                           image: MemoryImage(
                                             base64Decode(
-                                              result[index]['transaksi'][0]
-                                                  ['bukti_pembayaran'],
+                                              result[index]['bukti_pembayaran'],
                                             ),
                                           ),
                                           fit: BoxFit.contain,
@@ -223,9 +274,7 @@ class _BuktiPembayaranState extends State<BuktiPembayaran> {
                                         )
                                       : null,
                             ),
-                            child: (result[index]['transaksi'][0]
-                                        ['bukti_pembayaran'] !=
-                                    "")
+                            child: (result[index]['bukti_pembayaran'] != "")
                                 ? null
                                 : image != null
                                     ? null

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:badges/badges.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trifthing_apps/app/models/cart_modal.dart';
+import 'package:trifthing_apps/app/services/service_cart.dart';
 import '/app/controllers/controll.dart';
 import '../cart/cartPage.dart';
 import '../notificationPage.dart';
@@ -41,9 +43,30 @@ class _HomeScreenState extends State<HomeScreen> {
     String? currentId = lastId;
   }
 
+  int valueInCart = 0;
+  bool isLoading = false;
+
+  Future<void> getValueCart() async {
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastId = await Controller1.getCheckIdUser();
+
+    List<CartModal> valueCart =
+        await ServiceCart().getCart(id_user_pembeli: "${lastId}");
+
+    valueInCart = valueCart.length;
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   void initState() {
     tes();
+    getValueCart();
     super.initState();
   }
 
@@ -110,37 +133,15 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Badge(
-                  //   badgeContent: Text(
-                  //     "$valueNotification",
-                  //     style: TextStyle(color: Colors.white, fontSize: 12),
-                  //   ),
-                  //   padding: EdgeInsets.all(4),
-                  //   badgeColor: Color(0xFF9C62FF),
-                  //   showBadge: valueNotification < 1 ? false : true,
-                  //   child: InkWell(
-                  //     child: const FaIcon(
-                  //       FontAwesomeIcons.bell,
-                  //       color: Color(0xFF9C9FA8),
-                  //       size: 25,
-                  //     ),
-                  //     onTap: () {
-                  //       setState(() {
-                  //         Get.to(NotificationPage());
-                  //       });
-                  //     },
-                  //   ),
-                  // ),
-                  // SizedBox(width: 10),
                   Badge(
                     badgeContent: Text(
-                      "$valueCart",
+                      "$valueInCart",
                       style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     padding: EdgeInsets.all(4),
                     badgeColor: Color(0xFF9C62FF),
                     // animationType: BadgeAnimationType.slide,
-                    showBadge: valueCart < 1 ? false : true,
+                    showBadge: valueInCart < 1 ? false : true,
                     child: InkWell(
                       child: const Icon(
                         Icons.shopping_cart_outlined,
@@ -152,29 +153,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   ),
-                  // const SizedBox(width: 10),
-                  // Badge(
-                  //   badgeContent: Text(
-                  //     "$valueChat",
-                  //     style: const TextStyle(color: Colors.white, fontSize: 12),
-                  //   ),
-                  //   padding: const EdgeInsets.all(4),
-                  //   badgeColor: const Color(0xFF9C62FF),
-                  //   // animationType: BadgeAnimationType.slide,
-                  //   showBadge: valueChat < 1 ? false : true,
-                  //   child: InkWell(
-                  //     child: const FaIcon(
-                  //       FontAwesomeIcons.commentDots,
-                  //       color: Color(0xFF9C9FA8),
-                  //       size: 25,
-                  //     ),
-                  //     onTap: () {
-                  //       setState(() {
-                  //         valueChat += 1;
-                  //       });
-                  //     },
-                  //   ),
-                  // ),
                 ],
               ),
             ),

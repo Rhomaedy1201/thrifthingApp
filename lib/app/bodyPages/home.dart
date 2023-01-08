@@ -1,9 +1,16 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trifthing_apps/app/Pages/main/categoryPage.dart';
+import 'package:trifthing_apps/app/controllers/controll.dart';
+import 'package:trifthing_apps/app/utils/base_url.dart';
 import '/app/widgets/categoryProduct.dart';
 import '/app/widgets/itemsRecomendation.dart';
+import 'package:http/http.dart' as http;
 
 class HomeBody extends StatefulWidget {
   @override
@@ -13,14 +20,54 @@ class HomeBody extends StatefulWidget {
 class _HomeBodyState extends State<HomeBody> {
   @override
   void initState() {
+    getTransaksi();
     super.initState();
   }
 
-  int valueChat = 0;
+  List<dynamic> result = [];
+  var responseData;
+  int? tgl;
+  bool isLoading = false;
 
-  int valueCart = 0;
+  Future<void> getTransaksi() async {
+    DateFormat dateFormat = DateFormat("dd");
+    String day = dateFormat.format(DateTime.now());
+    setState(() {
+      isLoading = true;
+    });
 
-  int valueNotification = 0;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastId = await Controller1.getCheckIdUser();
+    Uri url = Uri.parse("$apiGetTransaksi?id_user=${lastId}");
+    var response = await http.get(url);
+    responseData = jsonDecode(response.body);
+    result = responseData['result'];
+
+    print(response.body);
+    for (var i = 0; i < result.length; i++) {
+      var cek =
+          DateFormat("dd").format(DateTime.parse(result[i]['tanggal_beli']));
+      tgl = int.parse(cek) + 1;
+
+      if (int.parse(day) >= tgl! && result[i]['status'] == "belum dibayar") {
+        Uri url2 = Uri.parse(
+            "$deleteDetailTrans?id_transaksi=${result[i]['id_transaksi']}");
+        var response2 = await http.delete(url2);
+        print(response2.body);
+      } else {
+        print("gausah hapus karena sudah dibayar");
+      }
+
+      print("cek $cek");
+      print("cek2 $tgl");
+      print("$day");
+      print("${result[0]['status']}");
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   int _current = 0;
 

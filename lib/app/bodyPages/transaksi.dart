@@ -33,36 +33,3 @@ class TransactionBody extends StatelessWidget {
     );
   }
 }
-
-// class ItemsTransaction extends StatefulWidget {
-//   @override
-//   State<ItemsTransaction> createState() => _ItemsTransactionState();
-// }
-
-// class _ItemsTransactionState extends State<ItemsTransaction> {
-  // List result = [];
-  // Future<void> getTransaksi() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? lastId = await Controller1.getCheckIdUser();
-  //   var currentId = lastId;
-  //   Uri url = Uri.parse(
-  //       "http://localhost/restApi_goThrift/transaksi/get_transaksi.php?id_alamat_user=${currentId}");
-  //   var response = await http.get(url);
-  //   result = json.decode(response.body)['result'];
-  //   setState(() {});
-  // }
-
-  // @override
-  // void initState() {
-  //   getTransaksi();
-  //   super.initState();
-  // }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Container(
-  //     padding: EdgeInsets.symmetric(horizontal: 19),
-  //     child: 
-  //   );
-  // }
-// }
