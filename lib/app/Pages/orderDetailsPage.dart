@@ -321,7 +321,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                   Container(
                     padding: const EdgeInsets.only(
-                        left: 16, right: 16, top: 20, bottom: 0),
+                        left: 16, right: 16, top: 20, bottom: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -373,7 +373,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                             )),
                                       ),
                                       Container(
-                                        width: 285,
+                                        width: 240,
+                                        // color: Colors.amber,
                                         margin: const EdgeInsets.symmetric(
                                             horizontal: 12),
                                         child: Column(
@@ -439,7 +440,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 1,
                             mainAxisSpacing: 15,
-                            childAspectRatio: 7 / 2.5,
+                            childAspectRatio: 7 / 2.55,
                           ),
                           shrinkWrap: true,
                           primary: false,
@@ -501,7 +502,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  width: 120,
+                                  width: 110,
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,

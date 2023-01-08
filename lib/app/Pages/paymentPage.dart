@@ -216,7 +216,7 @@ class _PaymentPageState extends State<PaymentPage> {
                             ),
                             SizedBox(width: 10),
                             Text(
-                              "Gunakan ATM / iBankng / mBanking / Setor tunai \nuntuk transfer ke rekening berikut ini:",
+                              "Gunakan ATM / iBankng / mBanking / Setor \ntunai untuk transfer ke rekening berikut ini:",
                               style: TextStyle(
                                   fontSize: 15,
                                   color: Color(0xff727272),
@@ -257,7 +257,7 @@ class _PaymentPageState extends State<PaymentPage> {
                                   ),
                                   const SizedBox(width: 10),
                                   Container(
-                                    width: 270,
+                                    width: 251,
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,

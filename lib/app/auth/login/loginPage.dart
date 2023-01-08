@@ -4,7 +4,9 @@ import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:trifthing_apps/app/Pages/home_screen.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
+import 'package:trifthing_apps/app/widgets/small_loading.dart';
 import '/app/controllers/controll.dart';
 import '/app/loadingPages/loadingHome.dart';
 import '/app/auth/forget/forgetPasswordPage.dart';
@@ -25,6 +27,8 @@ class _LoginPageState extends State<LoginPage> {
 
   bool email = false;
   bool sandi = false;
+
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -47,6 +51,10 @@ class _LoginPageState extends State<LoginPage> {
 
   var userData;
   Future<void> loginUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
     Uri url = Uri.parse(
         "$apiLoginUser?email=${txtEmail.text.toString()}&kata_sandi=${txtKata_sandi.text.toString()}");
     var response = await http.get(url);
@@ -56,10 +64,13 @@ class _LoginPageState extends State<LoginPage> {
       var convertDataToJson = jsonDecode(response.body);
       userData = (convertDataToJson as List<dynamic>);
       print(userData[0]['type']);
+
+      isLoading = false;
+
       if (userData[0]['type'] == true) {
         resetCheckLogin();
         resetCheckIdUser();
-        Get.offAll(LoadingHome());
+        Get.offAll(HomeScreen());
       } else {
         CoolAlert.show(
           context: context,
@@ -254,42 +265,44 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  height: 55,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.deepPurple,
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(15),
-                    onTap: () {
-                      setState(() {
-                        if (txtEmail.text.isNotEmpty) {
-                          email = false;
-                          if (txtKata_sandi.text.isNotEmpty) {
-                            loginUser();
-                            // repoLogin.login(txtEmail.text.toString(),
-                            //     txtKata_sandi.text.toString());
-                          } else {
-                            sandi = true;
-                          }
-                        } else {
-                          email = true;
-                        }
-                      });
-                    },
-                    child: const Center(
-                      child: Text(
-                        "Masuk",
-                        style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white),
+                isLoading
+                    ? const SmallLoadingWidget()
+                    : Container(
+                        width: double.infinity,
+                        height: 55,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Colors.deepPurple,
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(15),
+                          onTap: () {
+                            setState(() {
+                              if (txtEmail.text.isNotEmpty) {
+                                email = false;
+                                if (txtKata_sandi.text.isNotEmpty) {
+                                  loginUser();
+                                  // repoLogin.login(txtEmail.text.toString(),
+                                  //     txtKata_sandi.text.toString());
+                                } else {
+                                  sandi = true;
+                                }
+                              } else {
+                                email = true;
+                              }
+                            });
+                          },
+                          child: const Center(
+                            child: Text(
+                              "Masuk",
+                              style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

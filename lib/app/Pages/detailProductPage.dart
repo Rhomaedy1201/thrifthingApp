@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trifthing_apps/app/controllers/controll.dart';
 import 'package:trifthing_apps/app/utils/base_url.dart';
 import 'package:trifthing_apps/app/widgets/big_loading.dart';
+import 'package:trifthing_apps/app/widgets/small_loading.dart';
 import '/app/Pages/checkoutPage.dart';
 
 class DetailProductPage extends StatefulWidget {
@@ -188,101 +189,102 @@ class _DetailProductPageState extends State<DetailProductPage> {
                   ),
                 ],
               ),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 19, vertical: 13),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: result.length,
-                  itemBuilder: (context, index) {
-                    return Row(
-                      children: [
-                        Container(
-                          width: 85,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Color(0xFF9C62FF),
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(30),
+              child: isLoading
+                  ? const SmallLoadingWidget()
+                  : Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 19, vertical: 13),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 75,
+                                height: 46,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Color(0xFF9C62FF),
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: const Center(
+                                    child: FaIcon(
+                                  FontAwesomeIcons.commentDots,
+                                  size: 22,
+                                  color: Color(0xFF9C62FF),
+                                )),
+                              ),
+                              SizedBox(width: 5),
+                              Container(
+                                width: 75,
+                                height: 46,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Color(0xFF9C62FF),
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: const Center(
+                                    child: Icon(
+                                  Icons.shopping_bag_outlined,
+                                  size: 25,
+                                  color: Color(0xFF9C62FF),
+                                )),
+                              ),
+                            ],
                           ),
-                          child: const Center(
-                              child: FaIcon(
-                            FontAwesomeIcons.commentDots,
-                            size: 26,
-                            color: Color(0xFF9C62FF),
-                          )),
-                        ),
-                        SizedBox(width: 5),
-                        Container(
-                          width: 85,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Color(0xFF9C62FF),
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: const Center(
-                              child: Icon(
-                            Icons.shopping_bag_outlined,
-                            size: 29,
-                            color: Color(0xFF9C62FF),
-                          )),
-                        ),
-                        const SizedBox(width: 5),
-                        InkWell(
-                          onTap: () {
-                            if (cekAddress == true) {
-                              Get.to(CheckoutPage(
-                                idProduk: result[0]['id_produk'].toString(),
-                                idUser: result[0]['id_user'].toString(),
-                                idKat: result[0]['id_kategori'.toString()],
-                                idKotaPengirim: result[0]['id_kota'],
-                                // idKotaPenerima: idKotaPenerima.toString(),
-                                berat: result[0]['berat'],
-                                pengiriman: "pos",
-                                jmlBeli: jmlBeli.toInt(),
-                              ));
-                            } else {
-                              CoolAlert.show(
-                                context: context,
-                                type: CoolAlertType.warning,
-                                text:
-                                    'Lengkapi Data diri anda terlibih dahulu\nseperti alamat dll.',
-                                confirmBtnColor: Colors.deepPurple,
-                                confirmBtnText: "Ok",
-                                onConfirmBtnTap: () async {
-                                  Navigator.of(context).pop();
-                                },
-                              );
-                            }
-                          },
-                          child: Container(
-                            width: bodyWidth * 0.49,
-                            height: 46,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              color: Color(0xFF9C62FF),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "Beli Sekarang",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
+                          InkWell(
+                            onTap: () {
+                              if (cekAddress == true) {
+                                Get.to(CheckoutPage(
+                                  idProduk: result[0]['id_produk'].toString(),
+                                  idUser: result[0]['id_user'].toString(),
+                                  idKat: result[0]['id_kategori'.toString()],
+                                  idKotaPengirim: result[0]['id_kota'],
+                                  // idKotaPenerima: idKotaPenerima.toString(),
+                                  berat: result[0]['berat'],
+                                  pengiriman: "pos",
+                                  jmlBeli: jmlBeli.toInt(),
+                                ));
+                              } else {
+                                CoolAlert.show(
+                                  context: context,
+                                  type: CoolAlertType.warning,
+                                  text:
+                                      'Lengkapi Data diri anda terlibih dahulu\nseperti alamat dll.',
+                                  confirmBtnColor: Colors.deepPurple,
+                                  confirmBtnText: "Ok",
+                                  onConfirmBtnTap: () async {
+                                    Navigator.of(context).pop();
+                                  },
+                                );
+                              }
+                            },
+                            child: Container(
+                              width: bodyWidth * 0.49,
+                              height: 46,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Color(0xFF9C62FF),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "Beli Sekarang",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
+                        ],
+                      ),
+                    ),
             ),
             body: ListView.builder(
               itemCount: result.length,

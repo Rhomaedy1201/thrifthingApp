@@ -131,7 +131,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
       print(response.body);
       if (response.statusCode == 200) {
-        resultPengiriman = jsonDecode(response.body);
+        setState(() {
+          resultPengiriman = jsonDecode(response.body);
+        });
       } else {
         log("api rajaongkir ${response.statusCode}");
       }
@@ -169,10 +171,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   // melakukan transaksi
   Future<void> postTransaksi() async {
-    setState(() {
-      isLoading = true;
-    });
-
     DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     String datetime = dateFormat.format(DateTime.now());
 
@@ -219,18 +217,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
     } catch (e) {
       log("pos trans $e");
     }
-
-    // print(response.body);
-    setState(() {
-      isLoading = false;
-    });
   }
 
   Future<void> postDetailTransaksi() async {
-    setState(() {
-      isLoading = true;
-    });
-
     try {
       Uri url = Uri.parse("$apiPostDetailTransaksi");
       var data = {
@@ -244,10 +233,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     } catch (e) {
       log("post detail $e");
     }
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   int ongkir = 20000;
@@ -308,7 +293,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ),
                       const SizedBox(width: 11),
                       Container(
-                          width: 310,
+                          width: 300,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -440,7 +425,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           width: 15,
                         ),
                         Container(
-                          width: 280,
+                          width: 250,
                           padding: const EdgeInsets.symmetric(vertical: 5),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -584,7 +569,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           horizontal: 15, vertical: 10),
                       child: ListView.builder(
                         shrinkWrap: true,
-                        itemCount: 1,
+                        itemCount: resultAlamat.length,
                         physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           return Column(
@@ -1194,7 +1179,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
                 child: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: 1,
+                  itemCount: result.length,
                   physics: const ClampingScrollPhysics(),
                   itemBuilder: (context, index) {
                     return Row(
@@ -1205,7 +1190,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             backgroundColor: const Color(0xFF9C62FF),
                             minimumSize: const Size(180, 65),
                             shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.zero)),
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(20),
+                              ),
+                            ),
                           ),
                           onPressed: () {
                             postTransaksi();
@@ -1230,14 +1218,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     const Text(
                                       "Total Pembayaran",
                                       style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFF585858)),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF585858),
+                                      ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      "Rp${NumberFormat('#,###,000').format(result[index]['harga'] + resultPengiriman['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value'])}"
-                                          .replaceAll(",", "."),
+                                      "Rp${result[index]['harga'] + resultPengiriman['rajaongkir']['results'][index]['costs'][0]['cost'][0]['value']}",
                                       style: const TextStyle(
                                           fontSize: 19,
                                           fontWeight: FontWeight.w700,

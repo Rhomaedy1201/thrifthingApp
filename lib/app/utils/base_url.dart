@@ -1,4 +1,4 @@
-String url = "http://192.168.1.4/restApi_goThrift";
+String url = "https://trifthing.wstif3c.id/restApi_goThrift";
 
 var apiGetKategory = "$url/kategori_produk/get_kategori_produk.php";
 var apiProdukUser = "$url/produk_user/get_produk_user.php";
@@ -19,3 +19,7 @@ var apiPostUser = "$url/users/post_users.php";
 var apiSearchProduk = "$url/produk_user/search_produk_user.php";
 
 var updateStatusTrans = "$url/transaksi/update_status_transaksi.php";
+
+var getPengiriman = "$url/API-Pengiriman/pengiriman.php";
+
+var postDetailAlamat = "$url/detail_alamat_user/post_detail_alamat.php";

@@ -248,12 +248,6 @@ class _ProfileBodyState extends State<ProfileBody> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 13,
-                                  ),
-                                  const Divider(
-                                    color: Color(0xff727272),
-                                  )
                                 ],
                               ),
                             ),

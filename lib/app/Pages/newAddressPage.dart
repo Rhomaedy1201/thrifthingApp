@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trifthing_apps/app/utils/base_url.dart';
 import '/app/controllers/controll.dart';
 import '/app/models/city_model.dart';
 import '/app/models/province_model.dart';
@@ -44,33 +45,31 @@ class _NewAddressPageState extends State<NewAddressPage> {
     );
   }
 
-  var convert;
-
   void postAlamat() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? lastId = await Controller1.getCheckIdUser();
     String? currentId = lastId;
-    Uri url = Uri.parse(
-        "http://localhost/restApi_goThrift/detail_alamat_user/post_detail_alamat.php");
+    Uri url = Uri.parse("$postDetailAlamat");
     var data = {
-      "id_user": currentId.toString(),
-      "nama_lengkap_kontak_alamat": txtNama.text.toString(),
-      "no_hp_kontak_alamat": txtNomor.text.toString(),
-      "id_provinsi": idProv.toString(),
-      "provinsi": namaProv.toString(),
-      "id_kota": idKota.toString(),
-      "kota": namaKota.toString(),
-      "id_kecamatan": "".toString(),
-      "kecamatan": "".toString(),
-      "kode_pos": txtKodePos.text.toString(),
-      "detail_jalan": txtJalan.text.toString(),
-      "detail_patokan": txtPatokan.text.toString(),
-      "status": "user".toString(),
+      "id_user": "$currentId",
+      "nama_lengkap_kontak_alamat": "${txtNama.text}",
+      "no_hp_kontak_alamat": "${txtNomor.text}",
+      "id_provinsi": "$idProv",
+      "provinsi": "$namaProv",
+      "id_kota": "$idKota",
+      "kota": "$namaKota",
+      "id_kecamatan": "",
+      "kecamatan": "",
+      "kode_pos": "${txtKodePos.text}",
+      "detail_jalan": "${txtJalan.text}",
+      "detail_patokan": "${txtPatokan.text}",
+      "status": "user",
     };
-    final response = await http.post(url, body: data);
-    final convert = json.decode(response.body)[0]['type'];
+    var response = await http.post(url, body: data);
     // print(response.body);
-    // print(convert);
+    // List result = json.decode(response.body);
+    // print(result[0]['type']);
+    var convert = json.decode(response.body)[0]['type'];
     if (convert == true) {
       CoolAlert.show(
         context: context,

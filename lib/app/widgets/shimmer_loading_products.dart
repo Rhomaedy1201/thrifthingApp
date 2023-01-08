@@ -7,7 +7,7 @@ class ShimmerLoadingProducts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      itemCount: 4,
+      itemCount: 6,
       itemBuilder: (context, index) {
         return Container(
           decoration: BoxDecoration(

@@ -66,7 +66,7 @@ class ItemsWishlist extends StatelessWidget {
     return Container(
       color: Colors.transparent,
       margin: EdgeInsets.symmetric(horizontal: 19),
-      height: MediaQuery.of(context).size.height * 0.149,
+      height: MediaQuery.of(context).size.height * 0.155,
       child: Column(
         children: [
           Row(

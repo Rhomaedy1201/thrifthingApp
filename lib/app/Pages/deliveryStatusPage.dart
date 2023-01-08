@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:trifthing_apps/app/utils/base_url.dart';
+import 'package:trifthing_apps/app/widgets/big_loading.dart';
 import '/app/loadingPages/loadingDeliveryStatus.dart';
 
 class DeliveryStatusPage extends StatefulWidget {
@@ -18,11 +20,16 @@ class _DeliveryStatusPageState extends State<DeliveryStatusPage> {
   var kurir = "tiki";
   var noresi = "030205696069";
 
+  bool isLoading = false;
   List? result;
   var ms;
   void getTranck() async {
+    setState(() {
+      isLoading = true;
+    });
+
     final url =
-        "http://localhost/API-Pengiriman/pengiriman.php?kurir=${kurir.toString()}&resi=${noresi.toString()}";
+        "$getPengiriman?kurir=${kurir.toString()}&resi=${noresi.toString()}";
     final response = await http.get(Uri.parse(url));
     setState(() {
       if (response.statusCode == 200) {
@@ -33,13 +40,21 @@ class _DeliveryStatusPageState extends State<DeliveryStatusPage> {
         print("Loading......");
       }
     });
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   var userData;
   List? convertDataToJson;
   Future<void> getTrancking() async {
+    setState(() {
+      isLoading = true;
+    });
+
     Uri url = Uri.parse(
-        "http://localhost/restApi_goThrift/API-Pengiriman/pengiriman.php?kurir=${kurir.toString()}&resi=${noresi.toString()}");
+        "$getPengiriman?kurir=${kurir.toString()}&resi=${noresi.toString()}");
     var response = await http.get(url);
     setState(() {
       if (response.body == null) {
@@ -50,6 +65,10 @@ class _DeliveryStatusPageState extends State<DeliveryStatusPage> {
         print(userData);
       }
     });
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   bool type = false;
@@ -57,17 +76,15 @@ class _DeliveryStatusPageState extends State<DeliveryStatusPage> {
   @override
   void initState() {
     getTrancking();
-    Timer(Duration(seconds: 3), () {
-      setState(() {});
-      type = true;
-    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return (type == false)
-        ? LoadingDeliveryStatus()
+    return isLoading
+        ? const Scaffold(
+            body: BigLoadingWidget(),
+          )
         : Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
