@@ -412,24 +412,24 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                       color: Color(0xffB1ACD4),
                                     ),
                                   ),
-                                  InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        wishlist = !wishlist;
-                                      });
-                                    },
-                                    child: (wishlist)
-                                        ? const FaIcon(
-                                            FontAwesomeIcons.heart,
-                                            size: 25,
-                                            color: Color(0xff9C9FA8),
-                                          )
-                                        : const FaIcon(
-                                            FontAwesomeIcons.solidHeart,
-                                            size: 25,
-                                            color: Color(0xFFFF0099),
-                                          ),
-                                  ),
+                                  // InkWell(
+                                  //   onTap: () {
+                                  //     setState(() {
+                                  //       wishlist = !wishlist;
+                                  //     });
+                                  //   },
+                                  //   child: (wishlist)
+                                  //       ? const FaIcon(
+                                  //           FontAwesomeIcons.heart,
+                                  //           size: 25,
+                                  //           color: Color(0xff9C9FA8),
+                                  //         )
+                                  //       : const FaIcon(
+                                  //           FontAwesomeIcons.solidHeart,
+                                  //           size: 25,
+                                  //           color: Color(0xFFFF0099),
+                                  //         ),
+                                  // ),
                                 ],
                               ),
                               Text(
@@ -750,26 +750,30 @@ class _DetailProductPageState extends State<DetailProductPage> {
                                               ),
                                             ),
                                             SizedBox(height: 10),
-                                            Text(
-                                              (result[index]['kondisi'] == "" ||
-                                                      result[index]
-                                                              ['kondisi'] ==
-                                                          null)
-                                                  ? "-"
-                                                  : result[index]['kondisi'],
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Color(0xff727272),
-                                              ),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.star_half,
+                                                  size: 17,
+                                                  color: Color(0xFFBEAB00),
+                                                ),
+                                                Text(
+                                                  " ${result[index]['kondisi']}.0 %",
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Color(0xff727272),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            SizedBox(height: 10),
+                                            const SizedBox(height: 10),
                                             Text(
                                               (result[index]['bahan'] == "" ||
                                                       result[index]['bahan'] ==
                                                           null)
-                                                  ? "-"
+                                                  ? "0.0"
                                                   : result[index]['bahan'],
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xff727272),
                                               ),

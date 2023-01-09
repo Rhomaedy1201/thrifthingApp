@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trifthing_apps/app/Pages/orders/checkoutPage.dart';
 import 'package:trifthing_apps/app/controllers/controll.dart';
@@ -161,14 +162,16 @@ class _CartPageState extends State<CartPage> {
               width: 220,
               height: 60,
               child: ElevatedButton(
-                onPressed: resultType == false
+                onPressed: loadingType
                     ? null
-                    : () {
-                        Get.to(CheckoutPage(
-                          idKotaPengirim: resultCart[0].id_kota_penjual,
-                          berat: subBerat,
-                        ));
-                      },
+                    : resultType == false
+                        ? null
+                        : () {
+                            Get.to(CheckoutPage(
+                              idKotaPengirim: resultCart[0].id_kota_penjual,
+                              berat: subBerat,
+                            ));
+                          },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF9C62FF),
                   shape: RoundedRectangleBorder(
@@ -377,9 +380,26 @@ class _CartPageState extends State<CartPage> {
                     getProductCart();
                   },
                   child: ListView(
-                    children: const [
-                      Center(
-                        child: Text("Kosong"),
+                    children: [
+                      Column(
+                        children: [
+                          const SizedBox(height: 100),
+                          Container(
+                            width: 200,
+                            height: 150,
+                            child: Lottie.asset(
+                                "assets/lottie/iconPage/empty-cart.json"),
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            "Keranjang masih kosong",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF8D8D8D),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

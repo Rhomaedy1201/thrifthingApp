@@ -278,7 +278,8 @@ class _TransactionPageState extends State<TransactionPage> {
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(7),
-                                                          color: Colors.white,
+                                                          color:
+                                                              Color(0xFFD4D4D4),
                                                           // image: DecorationImage(
                                                           //   image: MemoryImage(
                                                           //       base64Decode(
@@ -302,7 +303,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                                           children: [
                                                             Text(
                                                               // "${result2[index]['nama_produk']}",
-                                                              "Nama produk",
+                                                              "Nama product",
                                                               style: const TextStyle(
                                                                   fontSize: 15,
                                                                   fontWeight:

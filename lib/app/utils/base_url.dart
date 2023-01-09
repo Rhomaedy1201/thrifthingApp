@@ -1,5 +1,5 @@
-// String url = "https://trifthing.wstif3c.id/restApi_goThrift";
-String url = "http://localhost/restApi_goThrift";
+String url = "https://trifthing.wstif3c.id/restApi_goThrift";
+// String url = "http://localhost/restApi_goThrift";
 
 var apiGetKategory = "$url/kategori_produk/get_kategori_produk.php";
 var apiProdukUser = "$url/produk_user/get_produk_user.php";

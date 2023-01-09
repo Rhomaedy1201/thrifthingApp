@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
         Get.offAll(HomeScreen());
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            backgroundColor: Color(0xFF77E37B),
+            backgroundColor: Color(0xC027AD2C),
             content: Text(
               'Login Berhasil!',
               textAlign: TextAlign.center,
@@ -257,24 +257,24 @@ class _LoginPageState extends State<LoginPage> {
                     style: const TextStyle(fontSize: 13, color: Colors.red),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Get.to(ForgetPasswordPage());
-                      },
-                      child: const Text(
-                        "Lupa Sandi?",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.end,
+                //   children: [
+                //     InkWell(
+                //       onTap: () {
+                //         Get.to(ForgetPasswordPage());
+                //       },
+                //       child: const Text(
+                //         "Lupa Sandi?",
+                //         style: TextStyle(
+                //           fontSize: 15,
+                //           fontWeight: FontWeight.w600,
+                //           color: Colors.deepPurple,
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(height: 20),
                 isLoading
                     ? const SmallLoadingWidget()
@@ -315,61 +315,61 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                 const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 2,
-                      width: 140,
-                      color: const Color(0xFFE5E5E5),
-                    ),
-                    const Text("Atau",
-                        style:
-                            TextStyle(fontSize: 16, color: Color(0xff868686))),
-                    Container(
-                      height: 2,
-                      width: 140,
-                      color: const Color(0xFFE5E5E5),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   crossAxisAlignment: CrossAxisAlignment.center,
+                //   children: [
+                //     Container(
+                //       height: 2,
+                //       width: 140,
+                //       color: const Color(0xFFE5E5E5),
+                //     ),
+                //     const Text("Atau",
+                //         style:
+                //             TextStyle(fontSize: 16, color: Color(0xff868686))),
+                //     Container(
+                //       height: 2,
+                //       width: 140,
+                //       color: const Color(0xFFE5E5E5),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  height: 55,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: const Color(0xFFEDF2F6),
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(15),
-                    onTap: () {},
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 20),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Image(
-                            image: AssetImage('assets/logo/google.png'),
-                            width: 22,
-                            height: 22,
-                          ),
-                          SizedBox(width: 20),
-                          Text(
-                            "Masuk dengan Google",
-                            style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF4E4E4E)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
+                // Container(
+                //   width: double.infinity,
+                //   height: 55,
+                //   decoration: BoxDecoration(
+                //     borderRadius: BorderRadius.circular(15),
+                //     color: const Color(0xFFEDF2F6),
+                //   ),
+                //   child: InkWell(
+                //     borderRadius: BorderRadius.circular(15),
+                //     onTap: () {},
+                //     child: Container(
+                //       margin: const EdgeInsets.only(right: 20),
+                //       child: Row(
+                //         crossAxisAlignment: CrossAxisAlignment.center,
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: const [
+                //           Image(
+                //             image: AssetImage('assets/logo/google.png'),
+                //             width: 22,
+                //             height: 22,
+                //           ),
+                //           SizedBox(width: 20),
+                //           Text(
+                //             "Masuk dengan Google",
+                //             style: TextStyle(
+                //                 fontSize: 17,
+                //                 fontWeight: FontWeight.w500,
+                //                 color: Color(0xFF4E4E4E)),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

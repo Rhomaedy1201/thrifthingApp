@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _widgetOption = [
     HomeBody(),
-    WishlistPage(),
+    // WishlistPage(),
     TransactionPage(),
     ProfileBody(),
   ];
@@ -189,18 +189,18 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 21,
             ),
           ),
-          BottomNavigationBarItem(
-            icon: FaIcon(
-              FontAwesomeIcons.heart,
-              size: 21,
-              color: Color(0xFF9C9FA8),
-            ),
-            label: "Wishlist",
-            activeIcon: FaIcon(
-              FontAwesomeIcons.solidHeart,
-              size: 21,
-            ),
-          ),
+          // BottomNavigationBarItem(
+          //   icon: FaIcon(
+          //     FontAwesomeIcons.heart,
+          //     size: 21,
+          //     color: Color(0xFF9C9FA8),
+          //   ),
+          //   label: "Wishlist",
+          //   activeIcon: FaIcon(
+          //     FontAwesomeIcons.solidHeart,
+          //     size: 21,
+          //   ),
+          // ),
           BottomNavigationBarItem(
             icon: FaIcon(
               FontAwesomeIcons.fileLines,
