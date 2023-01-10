@@ -38,6 +38,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   String noResi = "";
   bool isLoading = false;
+  bool isLoading2 = false;
   bool isLoadingAlamat = false;
 
   SnackBar resiTrue = const SnackBar(
@@ -65,7 +66,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   List resultProduk = [];
   Future<void> _getOnlyProduk() async {
     setState(() {
-      isLoading = true;
+      isLoading2 = true;
     });
 
     Uri url = Uri.parse(
@@ -74,7 +75,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     resultProduk = json.decode(response.body)['result'];
 
     setState(() {
-      isLoading = false;
+      isLoading2 = false;
     });
   }
 
@@ -143,620 +144,659 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         ? const Scaffold(
             body: BigLoadingWidget(),
           )
-        : Scaffold(
-            backgroundColor: Colors.white,
-            bottomNavigationBar: loadingStatus
-                ? const SmallLoadingWidget()
-                : Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: Container(
-                        height: 47,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: result.length,
-                          physics: const ClampingScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            return ElevatedButton(
-                              onPressed: result[index]['status'] ==
-                                          "Diproses" ||
-                                      result[index]['status'] == "Dikirim"
-                                  ? resultUpdateStatus == "Diterima"
-                                      ? null
-                                      : () {
-                                          CoolAlert.show(
-                                            context: context,
-                                            type: CoolAlertType.warning,
-                                            text:
-                                                'Apakah yakin sudah menerima barang?',
-                                            confirmBtnColor: Colors.deepPurple,
-                                            cancelBtnText: "Batal",
-                                            confirmBtnText: "Terima",
-                                            showCancelBtn: true,
-                                            onCancelBtnTap: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            onConfirmBtnTap: () async {
-                                              updateStatus();
-                                              setState(() {
-                                                getTransaksi();
-                                              });
-                                              Get.back();
-
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  backgroundColor:
-                                                      Color(0xFF1FA324),
-                                                  content: Text(
-                                                    'Barang sudah diterima👌',
-                                                    textAlign: TextAlign.center,
-                                                    style:
-                                                        TextStyle(fontSize: 15),
-                                                  ),
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        }
-                                  : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF9C62FF),
-                              ),
-                              child: const Text(
-                                "Terima Pesanan",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            );
-                          },
-                        )),
-                  ),
-            appBar: AppBar(
-              centerTitle: true,
-              backgroundColor: Colors.white,
-              iconTheme: const IconThemeData(color: Color(0xFF9C62FF)),
-              elevation: 2,
-              shadowColor: Color(0xFFF4F1F6),
-              title: const Text(
-                "Detail Pesanan",
-                style: TextStyle(
-                  color: Color(0xFF414141),
-                  fontSize: 20,
-                ),
-              ),
-            ),
-            body: RefreshIndicator(
-              onRefresh: () => getTransaksi(),
-              child: ListView(
-                children: [
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const ClampingScrollPhysics(),
-                    itemCount: result.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        // color: Colors.amber,
+        : isLoading2
+            ? const Scaffold(
+                body: BigLoadingWidget(),
+              )
+            : Scaffold(
+                backgroundColor: Colors.white,
+                bottomNavigationBar: loadingStatus
+                    ? const SmallLoadingWidget()
+                    : Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            horizontal: 20, vertical: 10),
+                        child: Container(
+                            height: 47,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: result.length,
+                              physics: const ClampingScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                return ElevatedButton(
+                                  onPressed: result[index]['status'] ==
+                                              "Diproses" ||
+                                          result[index]['status'] == "Dikirim"
+                                      ? resultUpdateStatus == "Diterima"
+                                          ? null
+                                          : () {
+                                              CoolAlert.show(
+                                                context: context,
+                                                type: CoolAlertType.warning,
+                                                text:
+                                                    'Apakah yakin sudah menerima barang?',
+                                                confirmBtnColor:
+                                                    Colors.deepPurple,
+                                                cancelBtnText: "Batal",
+                                                confirmBtnText: "Terima",
+                                                showCancelBtn: true,
+                                                onCancelBtnTap: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                onConfirmBtnTap: () async {
+                                                  updateStatus();
+                                                  setState(() {
+                                                    getTransaksi();
+                                                  });
+                                                  Get.back();
+
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      backgroundColor:
+                                                          Color(0xFF1FA324),
+                                                      content: Text(
+                                                        'Barang sudah diterima👌',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                            fontSize: 15),
+                                                      ),
+                                                      behavior: SnackBarBehavior
+                                                          .floating,
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            }
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF9C62FF),
+                                  ),
+                                  child: const Text(
+                                    "Terima Pesanan",
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                );
+                              },
+                            )),
+                      ),
+                appBar: AppBar(
+                  centerTitle: true,
+                  backgroundColor: Colors.white,
+                  iconTheme: const IconThemeData(color: Color(0xFF9C62FF)),
+                  elevation: 2,
+                  shadowColor: Color(0xFFF4F1F6),
+                  title: const Text(
+                    "Detail Pesanan",
+                    style: TextStyle(
+                      color: Color(0xFF414141),
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                body: RefreshIndicator(
+                  onRefresh: () => getTransaksi(),
+                  child: ListView(
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const ClampingScrollPhysics(),
+                        itemCount: result.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            // color: Colors.amber,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Column(
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${result[index]['status']}"
+                                              .capitalizeFirst!,
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.black),
+                                        ),
+                                        result[index]['status'] !=
+                                                "Sudah dibayar"
+                                            ? Container()
+                                            : result[index]['status'] ==
+                                                    "Diproses"
+                                                ? Container()
+                                                : const Text(
+                                                    "Menunggu confirmasi penjual",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                      ],
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        Get.to(PaymentPage(
+                                          idTransaksi:
+                                              "${result[index]['id_transaksi']}",
+                                          id_alamat_penerima:
+                                              "${result[index]['id_user']}",
+                                        ));
+                                      },
+                                      child: Row(
+                                        children: const [
+                                          Text(
+                                            "Lihat Detail",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.black),
+                                          ),
+                                          Icon(
+                                            Icons.navigate_next_outlined,
+                                            color: Color(0xff727272),
+                                            size: 25,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5),
+                                const Divider(
+                                  color: Color(0xFFCECECE),
+                                ),
+                                const SizedBox(height: 5),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Tanggal pembelian",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xff727272)),
+                                    ),
+                                    Text(
+                                      "${DateFormat("dd-MMM-yyyy HH:mm").format(DateTime.parse(result[index]['tanggal_beli']))}",
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 8,
+                        color: Color(0xFFF1F1F1),
+                      ),
+                      isLoading2
+                          ? const Scaffold(
+                              body: BigLoadingWidget(),
+                            )
+                          : Container(
+                              padding: const EdgeInsets.only(
+                                  left: 16, right: 16, top: 20, bottom: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Detail Produk",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  GridView.builder(
+                                    itemCount: resultProduk.length,
+                                    itemBuilder: (context, index) {
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 17, vertical: 14),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(0xFFC1C1C1),
+                                              blurRadius: 4,
+                                              offset: Offset(
+                                                  0, 0), // Shadow position
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  width: 55,
+                                                  height: 55,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    image: DecorationImage(
+                                                      image: MemoryImage(
+                                                          base64Decode(
+                                                              "${resultProduk[index]['produk'][0]['gambar']}")),
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: 240,
+                                                  // color: Colors.amber,
+                                                  margin: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 12),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "${resultProduk[index]['produk'][0]['nama_produk']}",
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          color: Colors.black,
+                                                        ),
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      Text(
+                                                        "${resultProduk[index]['transaksi'][0]['jumlah_beli']} x Rp${NumberFormat('#,###').format(resultProduk[index]['produk'][0]['harga'])}"
+                                                            .replaceAll(
+                                                                ",", "."),
+                                                        style: const TextStyle(
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color:
+                                                              Color(0xff727272),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            const Divider(
+                                              color: Color(0xFFCECECE),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  "Total Harga",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Color(0xff727272),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Rp${NumberFormat('#,###').format(resultProduk[index]['produk'][0]['harga'] * resultProduk[index]['transaksi'][0]['jumlah_beli'])}"
+                                                      .replaceAll(",", "."),
+                                                  style: const TextStyle(
+                                                    fontSize: 13.5,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 1,
+                                      mainAxisSpacing: 15,
+                                      childAspectRatio: 7 / 2.45,
+                                    ),
+                                    shrinkWrap: true,
+                                    primary: false,
+                                  ),
+                                ],
+                              ),
+                            ),
+                      Container(
+                        width: double.infinity,
+                        height: 8,
+                        color: Color(0xFFF1F1F1),
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const ClampingScrollPhysics(),
+                        itemCount: result.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Info Pengiriman",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.black),
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        Get.to(const DeliveryStatusPage());
+                                      },
+                                      child: Row(
+                                        children: const [
+                                          Text(
+                                            "Lihat Pengiriman",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.black),
+                                          ),
+                                          Icon(
+                                            Icons.navigate_next_outlined,
+                                            color: Color(0xff727272),
+                                            size: 25,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 20),
+                                Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Container(
+                                      width: 110,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            "Kurir",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Color(0xff727272),
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Container(
+                                            width: 70,
+                                            child: InkWell(
+                                              onTap: () {
+                                                (result[index]['no_resi'] ==
+                                                            null ||
+                                                        result[index]
+                                                                ['no_resi'] ==
+                                                            "")
+                                                    ? ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(resiFalse)
+                                                    : ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(resiTrue);
+                                                Clipboard.setData(
+                                                  ClipboardData(
+                                                    text: noResi.toString(),
+                                                  ),
+                                                );
+                                              },
+                                              child: Row(
+                                                children: const [
+                                                  Text(
+                                                    "No Resi",
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      color: Color(0xff727272),
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 5),
+                                                  Icon(
+                                                    Icons.copy,
+                                                    size: 18,
+                                                    color: Color(0xff727272),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          const Text(
+                                            "Alamat",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Color(0xff727272),
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    isLoadingAlamat
+                                        ? const SmallLoadingWidget()
+                                        : Container(
+                                            width: 250,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${result[index]['nama_pengiriman']} reguler"
+                                                      .capitalize!,
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Text(
+                                                  (result[index]['no_resi'] ==
+                                                              null ||
+                                                          result[index]
+                                                                  ['no_resi'] ==
+                                                              "")
+                                                      ? "- (Penjual belum update No. Resi)"
+                                                      : "${result[index]['no_resi']}",
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Text(
+                                                  "${alamat[index]['nama_lengkap_alamat']}\n${alamat[index]['no_hp_alamat']}\n${alamat[index]['detail_jalan']} (${alamat[index]['detail_patokan']})\n" +
+                                                      "KAB. ${alamat[index]['kota']}, ${alamat[index]['provinsi']} ${alamat[index]['kode_pos']}"
+                                                          .toUpperCase(),
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 8,
+                        color: Color(0xFFF1F1F1),
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: result.length,
+                        physics: const ClampingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Rincian Pembayaran",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Metode pembayaran",
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w300,
+                                          color: Color(0xff727272)),
+                                    ),
                                     Text(
-                                      "${result[index]['status']}"
-                                          .capitalizeFirst!,
+                                      "Bank ${result[index]['nama_bank']}"
+                                          .toUpperCase(),
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w300,
+                                          color: Color(0xff000000)),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5),
+                                const Divider(
+                                  color: Color(0xFFCECECE),
+                                ),
+                                const SizedBox(height: 7),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Total Harga (${result[index]['jml_barang']} barang)",
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w300,
+                                          color: Color(0xff727272)),
+                                    ),
+                                    Text(
+                                      "Rp ${NumberFormat('#,###').format(result[index]['subTotal'] - result[index]['harga_pengiriman'])}"
+                                          .replaceAll(",", "."),
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w300,
+                                          color: Color(0xff000000)),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Total Ongkos Kirim",
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w300,
+                                          color: Color(0xff727272)),
+                                    ),
+                                    Text(
+                                      "Rp ${NumberFormat('#,###').format(result[index]['harga_pengiriman'])}"
+                                          .replaceAll(",", "."),
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w300,
+                                          color: Color(0xff000000)),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 7),
+                                const Divider(
+                                  color: Color(0xFFCECECE),
+                                ),
+                                const SizedBox(height: 5),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Total Belanja",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.black),
+                                    ),
+                                    Text(
+                                      "Rp${NumberFormat('#,###').format(result[index]['subTotal'])}"
+                                          .replaceAll(",", "."),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
                                           color: Colors.black),
                                     ),
-                                    result[index]['status'] != "Sudah dibayar"
-                                        ? Container()
-                                        : result[index]['status'] == "Diproses"
-                                            ? Container()
-                                            : const Text(
-                                                "Menunggu confirmasi penjual",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
                                   ],
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(PaymentPage(
-                                      idTransaksi:
-                                          "${result[index]['id_transaksi']}",
-                                      id_alamat_penerima:
-                                          "${result[index]['id_user']}",
-                                    ));
-                                  },
-                                  child: Row(
-                                    children: const [
-                                      Text(
-                                        "Lihat Detail",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.black),
-                                      ),
-                                      Icon(
-                                        Icons.navigate_next_outlined,
-                                        color: Color(0xff727272),
-                                        size: 25,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                )
                               ],
                             ),
-                            const SizedBox(height: 5),
-                            const Divider(
-                              color: Color(0xFFCECECE),
-                            ),
-                            const SizedBox(height: 5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Tanggal pembelian",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff727272)),
-                                ),
-                                Text(
-                                  "${DateFormat("dd-MMM-yyyy HH:mm").format(DateTime.parse(result[index]['tanggal_beli']))}",
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 8,
-                    color: Color(0xFFF1F1F1),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(
-                        left: 16, right: 16, top: 20, bottom: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Detail Produk",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black),
-                        ),
-                        const SizedBox(height: 20),
-                        GridView.builder(
-                          itemCount: resultProduk.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 17, vertical: 14),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color(0xFFC1C1C1),
-                                    blurRadius: 4,
-                                    offset: Offset(0, 0), // Shadow position
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        width: 55,
-                                        height: 55,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          image: DecorationImage(
-                                            image: MemoryImage(base64Decode(
-                                                "${resultProduk[index]['produk'][0]['gambar']}")),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 240,
-                                        // color: Colors.amber,
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 12),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${resultProduk[index]['produk'][0]['nama_produk']}",
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.black,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            Text(
-                                              "${resultProduk[index]['transaksi'][0]['jumlah_beli']} x Rp${NumberFormat('#,###').format(resultProduk[index]['produk'][0]['harga'])}"
-                                                  .replaceAll(",", "."),
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w400,
-                                                color: Color(0xff727272),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  const Divider(
-                                    color: Color(0xFFCECECE),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        "Total Harga",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff727272),
-                                        ),
-                                      ),
-                                      Text(
-                                        "Rp${NumberFormat('#,###').format(resultProduk[index]['produk'][0]['harga'] * resultProduk[index]['transaksi'][0]['jumlah_beli'])}"
-                                            .replaceAll(",", "."),
-                                        style: const TextStyle(
-                                          fontSize: 13.5,
-                                          fontWeight: FontWeight.w800,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 1,
-                            mainAxisSpacing: 15,
-                            childAspectRatio: 7 / 2.45,
-                          ),
-                          shrinkWrap: true,
-                          primary: false,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 8,
-                    color: Color(0xFFF1F1F1),
-                  ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const ClampingScrollPhysics(),
-                    itemCount: result.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Info Pengiriman",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(const DeliveryStatusPage());
-                                  },
-                                  child: Row(
-                                    children: const [
-                                      Text(
-                                        "Lihat Pengiriman",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.black),
-                                      ),
-                                      Icon(
-                                        Icons.navigate_next_outlined,
-                                        color: Color(0xff727272),
-                                        size: 25,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 110,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        "Kurir",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Color(0xff727272),
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Container(
-                                        width: 70,
-                                        child: InkWell(
-                                          onTap: () {
-                                            (result[index]['no_resi'] == null ||
-                                                    result[index]['no_resi'] ==
-                                                        "")
-                                                ? ScaffoldMessenger.of(context)
-                                                    .showSnackBar(resiFalse)
-                                                : ScaffoldMessenger.of(context)
-                                                    .showSnackBar(resiTrue);
-                                            Clipboard.setData(
-                                              ClipboardData(
-                                                text: noResi.toString(),
-                                              ),
-                                            );
-                                          },
-                                          child: Row(
-                                            children: const [
-                                              Text(
-                                                "No Resi",
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: Color(0xff727272),
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                              SizedBox(width: 5),
-                                              Icon(
-                                                Icons.copy,
-                                                size: 18,
-                                                color: Color(0xff727272),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      const Text(
-                                        "Alamat",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Color(0xff727272),
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                isLoadingAlamat
-                                    ? const SmallLoadingWidget()
-                                    : Container(
-                                        width: 250,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${result[index]['nama_pengiriman']} reguler"
-                                                  .capitalize!,
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Text(
-                                              (result[index]['no_resi'] ==
-                                                          null ||
-                                                      result[index]
-                                                              ['no_resi'] ==
-                                                          "")
-                                                  ? "- (Penjual belum update No. Resi)"
-                                                  : "${result[index]['no_resi']}",
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Text(
-                                              "${alamat[index]['nama_lengkap_alamat']}\n${alamat[index]['no_hp_alamat']}\n${alamat[index]['detail_jalan']} (${alamat[index]['detail_patokan']})\n" +
-                                                  "KAB. ${alamat[index]['kota']}, ${alamat[index]['provinsi']} ${alamat[index]['kode_pos']}"
-                                                      .toUpperCase(),
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 8,
-                    color: Color(0xFFF1F1F1),
-                  ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: result.length,
-                    physics: const ClampingScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Rincian Pembayaran",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Metode pembayaran",
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color(0xff727272)),
-                                ),
-                                Text(
-                                  "Bank ${result[index]['nama_bank']}"
-                                      .toUpperCase(),
-                                  style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color(0xff000000)),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            const Divider(
-                              color: Color(0xFFCECECE),
-                            ),
-                            const SizedBox(height: 7),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Total Harga (${result[index]['jml_barang']} barang)",
-                                  style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color(0xff727272)),
-                                ),
-                                Text(
-                                  "Rp ${NumberFormat('#,###').format(result[index]['subTotal'] - result[index]['harga_pengiriman'])}"
-                                      .replaceAll(",", "."),
-                                  style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color(0xff000000)),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Total Ongkos Kirim",
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color(0xff727272)),
-                                ),
-                                Text(
-                                  "Rp ${NumberFormat('#,###').format(result[index]['harga_pengiriman'])}"
-                                      .replaceAll(",", "."),
-                                  style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color(0xff000000)),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 7),
-                            const Divider(
-                              color: Color(0xFFCECECE),
-                            ),
-                            const SizedBox(height: 5),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Total Belanja",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black),
-                                ),
-                                Text(
-                                  "Rp${NumberFormat('#,###').format(result[index]['subTotal'])}"
-                                      .replaceAll(",", "."),
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
+                ),
+              );
   }
 }

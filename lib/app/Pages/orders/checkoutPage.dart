@@ -204,21 +204,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
       var hasil = json.decode(response.body);
       if (hasil[0]['type'] == true) {
         postDetailTransaksi();
-        Get.offAll(PaymentPage(
-          idTransaksi: "$idTrans",
-          id_alamat_penerima: "$lastId",
-        ));
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Color(0xFF1FA324),
-            content: Text(
-              'Checkout barang berhasil, silahkan melakukan pembayaran!',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15),
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
       } else {
         print("terjadi kesalahan untuk post transaksi");
       }
@@ -258,11 +243,27 @@ class _CheckoutPageState extends State<CheckoutPage> {
         log("post detail $e");
       }
     }
-    _deleteAllFromCart();
 
     setState(() {
       loadingDetailTrans = false;
     });
+
+    _deleteAllFromCart();
+    Get.offAll(PaymentPage(
+      idTransaksi: "$idTrans",
+      id_alamat_penerima: "$lastId",
+    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Color(0xFF1FA324),
+        content: Text(
+          'Checkout barang berhasil, silahkan melakukan pembayaran!',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 15),
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   bool loadingDeleteAll = false;
@@ -271,8 +272,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
       loadingDeleteAll = true;
     });
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastId = await Controller1.getCheckIdUser();
+
     bool? deleteAllCart =
-        await ServiceCart().deleteAllCart(idKeranjang: "$currentId");
+        await ServiceCart().deleteAllCart(idPembeli: "$lastId");
 
     setState(() {
       loadingDeleteAll = false;

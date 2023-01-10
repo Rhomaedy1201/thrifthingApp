@@ -112,10 +112,10 @@ class ServiceCart {
     }
   }
 
-  Future<bool?> deleteAllCart({required String idKeranjang}) async {
+  Future<bool?> deleteAllCart({required String idPembeli}) async {
     bool? result;
     var response = await http.delete(
-      Uri.parse("$deleteCartAll?id_user_pembeli=$idKeranjang"),
+      Uri.parse("$deleteCartAll?id_user_pembeli=$idPembeli"),
     );
 
     print(response.body);
