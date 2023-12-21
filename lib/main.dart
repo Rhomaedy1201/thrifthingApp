@@ -7,6 +7,7 @@ import 'app/Pages/intro/SplashScreen.dart';
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
   // await Firebase.initializeApp();
+  // 
   runApp(const MyApp());
 }
 
